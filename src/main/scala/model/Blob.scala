@@ -1,6 +1,6 @@
 package model
 
-/*case class Blob(
+case class Blob(
                val id: Int,
                val content: String
-               ) extends Object*/
+               ) extends Object
