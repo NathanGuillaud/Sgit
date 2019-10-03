@@ -3,19 +3,19 @@ package action
 case class BranchesAndTags()
 
 object BranchesAndTags {
-  def branch(): Unit = {
-    println("BRANCH")
+  def branch(command: Array[String]): Unit = {
+    println("BRANCH " + command.toString)
   }
 
   def branchAV(): Unit = {
     println("BRANCH -AV")
   }
 
-  def checkout(): Unit = {
-    println("CHECKOUT")
+  def checkout(command: Array[String]): Unit = {
+    println("CHECKOUT " + command.toString)
   }
 
-  def tag(): Unit = {
-    println("TAG")
+  def tag(command: Array[String]): Unit = {
+    println("TAG " + command.toString)
   }
 }

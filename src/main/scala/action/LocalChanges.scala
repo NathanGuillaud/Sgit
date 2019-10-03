@@ -12,11 +12,7 @@ object LocalChanges {
   }
 
   def add(command: Array[String]): Unit = {
-    if(command.size <= 1){
-      println("Vous devez préciser les fichiers à ajouter")
-    }else {
-      println("ADD " + command)
-    }
+    println("ADD " + command.toString)
   }
 
   def commit(): Unit = {

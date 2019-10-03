@@ -3,15 +3,15 @@ package action
 case class MergeAndRebase()
 
 object MergeAndRebase {
-  def merge(): Unit = {
-    println("MERGE")
+  def merge(command: Array[String]): Unit = {
+    println("MERGE " + command.toString)
   }
 
-  def rebase(): Unit = {
-    println("REBASE")
+  def rebase(command: Array[String]): Unit = {
+    println("REBASE " + command.toString)
   }
 
-  def rebaseI(): Unit = {
-    println("REBASE -I")
+  def rebaseI(command: Array[String]): Unit = {
+    println("REBASE -I " + command.toString)
   }
 }
