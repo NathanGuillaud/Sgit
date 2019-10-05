@@ -45,7 +45,7 @@ object Main extends App{
   }
 
   def commit(command: Array[String]): Unit = command match {
-    case Array("commit") => Commit.commit()
+    case Array("commit") => CommitAction.commit()
     case default => println("La commande sgit commit ne contient pas d'option")
   }
 

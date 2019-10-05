@@ -11,7 +11,7 @@ case class Tree(
   }
 
   def generateId(): String = {
-    FileManagement.hashTree(this.toString())
+    FileManagement.hashTreeOrCommit(this.toString())
   }
 
   override def toString(): String = {
@@ -24,7 +24,7 @@ case class Tree(
 
 object Tree {
   def apply(): Tree = {
-    var tree = new Tree
+    val tree = new Tree
     tree
   }
 }

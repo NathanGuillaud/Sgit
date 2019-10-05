@@ -17,10 +17,8 @@ object Add {
 
   def addElement(elem: String, parent: Option[Tree]): Unit = {
     if(new java.io.File(elem).isDirectory){
-      println("IS A TREE")
       addTree(elem, parent)
     } else if(new java.io.File(elem).isFile){
-      println("IS A BLOB")
       addBlob(elem, parent)
     } else {
       println("Pas encore implémenté : " + elem)

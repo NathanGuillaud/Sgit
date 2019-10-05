@@ -28,7 +28,7 @@ object FileManagement {
     bw.close()
   }
 
-  def hashTree(content: String): String = {
+  def hashTreeOrCommit(content: String): String = {
     String.format("%032x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(content.getBytes("UTF-8"))))
   }
 }
