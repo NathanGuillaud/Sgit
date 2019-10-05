@@ -3,7 +3,7 @@ package model
 import util.FileManagement
 
 case class Tree(
-               var id: Int = 0,
+               var id: String = "",
                var content: List[(String,String)] = List()
                ) {
   def addElement(elementType: String, id: String){
@@ -11,7 +11,9 @@ case class Tree(
   }
 
   def generateId(): String = {
-    FileManagement.hashTreeOrCommit(this.toString())
+    val hashId = FileManagement.hashTreeOrCommit(this.toString())
+    this.id = hashId
+    hashId
   }
 
   override def toString(): String = {

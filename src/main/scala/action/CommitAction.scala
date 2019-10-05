@@ -29,7 +29,7 @@ object CommitAction {
     val commit = new Commit(tree)
     //Commit hash
     val commitHashValue = commit.generateId()
-    println("Hash du tree à ajouter : " + commitHashValue)
+    println("Hash du commit à ajouter : " + commitHashValue)
     val commitFolderHash = commitHashValue.substring(0,2)
     val commitFileHash = commitHashValue.substring(2)
 

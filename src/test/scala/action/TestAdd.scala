@@ -12,12 +12,11 @@ class TestAdd extends FunSuite {
     createTmpDirectory()
     val nbOfTreesDirs = FileManagement.getListOfFilesAndDirectories(".sgit/objects/tree").length
     val nbOfBlobDirs = FileManagement.getListOfFilesAndDirectories(".sgit/objects/blob").length
-    println("TAILLEELELELELE : " + nbOfBlobDirs)
     Init.init()
     Add.add(Array("testAdd"))
     assert(FileManagement.getListOfFilesAndDirectories(".sgit/objects/tree").length == nbOfTreesDirs + 2)
     assert(FileManagement.getListOfFilesAndDirectories(".sgit/objects/blob").length == nbOfBlobDirs + 2)
-    removeTmpDirectory()
+    removeTmpDirectories()
   }
 
   def createTmpDirectory(): Unit = {
@@ -26,7 +25,7 @@ class TestAdd extends FunSuite {
     new File("testAdd/subDir/subDirTestAdd.txt").createNewFile()
   }
 
-  def removeTmpDirectory(): Unit = {
+  def removeTmpDirectories(): Unit = {
     //Remove directory added
     new Directory(new File("testAdd")).deleteRecursively()
 
