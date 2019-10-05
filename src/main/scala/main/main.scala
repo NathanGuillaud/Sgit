@@ -13,18 +13,18 @@ object Main extends App{
     eval(command)
   }
 
-  def eval(command: Array[String]): Unit = command match {
-    case Array("init", _*) => init(command)
-    case Array("status", _*) => status(command)
-    case Array("diff", _*) => diff(command)
-    case Array("add", _*) => add(command)
-    case Array("commit", _*) => commit(command)
-    case Array("log", _*) => log(command)
-    case Array("branch", _*) => branch(command)
-    case Array("checkout", _*) => checkout(command)
-    case Array("tag", _*) => tag(command)
-    case Array("merge", _*) => merge(command)
-    case Array("rebase", _*) => rebase(command)
+  def eval(command: Array[String]): Unit = command(0) match {
+    case "init" => init(command)
+    case "status" => status(command)
+    case "diff" => diff(command)
+    case "add" => add(command)
+    case "commit" => commit(command)
+    case "log" => log(command)
+    case "branch" => branch(command)
+    case "checkout" => checkout(command)
+    case "tag" => tag(command)
+    case "merge" => merge(command)
+    case "rebase" => rebase(command)
     case default => println("Cette action n'existe pas")
   }
 
@@ -45,7 +45,7 @@ object Main extends App{
 
   def add(command: Array[String]): Unit = command match {
     case Array("add") => println("Vous devez préciser les fichiers à ajouter avec la commande sgit add <files>")
-    case default => LocalChanges.add(command)
+    case default => LocalChanges.add(command.tail)
   }
 
   def commit(command: Array[String]): Unit = command match {
