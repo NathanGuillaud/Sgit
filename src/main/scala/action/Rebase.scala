@@ -1,11 +1,9 @@
 package action
 
-case class MergeAndRebase()
+case class Rebase()
 
-object MergeAndRebase {
-  def merge(command: Array[String]): Unit = {
-    println("MERGE " + command.toString)
-  }
+object Rebase {
+
 
   def rebase(command: Array[String]): Unit = {
     println("REBASE " + command.toString)

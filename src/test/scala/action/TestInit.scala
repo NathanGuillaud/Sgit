@@ -2,11 +2,10 @@ package action
 
 import java.io.File
 import org.scalatest.FunSuite
-import action.Creation
 
 class TestInit extends FunSuite {
   test("sgit init should create .sgit directory with directories and files") {
-    Creation.init()
+    Init.init()
     assert(new File(".sgit").exists())
     assert(new File(".sgit/objects/tree").exists())
     assert(new File(".sgit/objects/blob").exists())

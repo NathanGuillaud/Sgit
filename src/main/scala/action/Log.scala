@@ -1,8 +1,8 @@
 package action
 
-case class CommitHistory()
+case class Log()
 
-object CommitHistory {
+object Log {
   def log(): Unit = {
     println("LOG")
   }

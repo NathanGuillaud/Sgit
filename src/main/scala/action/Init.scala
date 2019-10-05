@@ -4,9 +4,9 @@ import java.io.File
 import java.nio.file.{Files, Paths}
 import util.FileManagement
 
-case class Creation()
+case class Init()
 
-object Creation {
+object Init {
   def init(): Unit = {
     println("INIT")
     val directory = System.getProperty("user.dir")

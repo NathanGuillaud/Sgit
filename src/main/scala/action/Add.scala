@@ -1,21 +1,14 @@
 package action
 
-import java.io.{BufferedWriter, File, FileWriter}
+import java.io.File
 import util.FileManagement
 import model.Tree
 
 import scala.io.Source
 
-case class LocalChanges()
+case class Add()
 
-object LocalChanges {
-  def status(): Unit = {
-    println("STATUS")
-  }
-
-  def diff(): Unit = {
-    println("DIFF")
-  }
+object Add {
 
   def add(command: Array[String]): Unit = {
     println("ADD")
@@ -82,9 +75,4 @@ object LocalChanges {
     parent
   }
 
-
-
-  def commit(): Unit = {
-    println("COMMIT")
-  }
 }
