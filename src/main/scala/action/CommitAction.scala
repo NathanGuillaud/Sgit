@@ -14,14 +14,15 @@ case class CommitAction()
 
 object CommitAction {
   def commit(): Unit = {
-    println("COMMIT")
-    val treeForCommit = createTree()
+    val currentBranch = SgitTools.getCurrentBranch()
+    val treeForCommit = createTree(currentBranch)
     val commit = createCommit(treeForCommit)
-    updateLogs(commit)
-    updateRef(commit)
+    updateLogs(commit, currentBranch)
+    updateRef(commit, currentBranch)
+    println("[" + currentBranch + " " + commit.id + "]")
   }
 
-  def createTree(): Tree = {
+  def createTree(currentBranch: String): Tree = {
     val tree = new Tree()
     //Tree hash
     val treeHashValue = tree.generateId()
@@ -54,8 +55,7 @@ object CommitAction {
     commit
   }
 
-  def updateLogs(commit: Commit): Unit ={
-    val currentBranch = SgitTools.getCurrentBranch()
+  def updateLogs(commit: Commit, currentBranch: String): Unit ={
     //If logs directory not exists
     if(Files.notExists(Paths.get(".sgit/logs"))){
       createLogDirectory(commit, currentBranch)
@@ -73,7 +73,7 @@ object CommitAction {
 
   def updateLogDirectory(commit: Commit, branch: String): Unit = {
     val headFileContent = Source.fromFile(".sgit/logs/HEAD").getLines.mkString("\n")
-    FileManagement.writeFile(".sgit/logs/HEAD", commit.toStringForLogs() + "\n" + headFileContent)
+    FileManagement.writeFile(".sgit/logs/HEAD", headFileContent + "\n" + commit.toStringForLogs())
     //If logs directory for the current branch not exists
     if(Files.notExists(Paths.get(".sgit/logs/refs/heads/" + branch))) {
       createLogFileForBranch(commit, branch)
@@ -81,7 +81,7 @@ object CommitAction {
     //If logs directory for the current branch exists
     else {
       val branchFileContent = Source.fromFile(".sgit/logs/refs/heads/" + branch).getLines.mkString("\n")
-      FileManagement.writeFile(".sgit/logs/refs/heads/" + branch, commit.toStringForLogs() + "\n" + branchFileContent)
+      FileManagement.writeFile(".sgit/logs/refs/heads/" + branch, branchFileContent + "\n" + commit.toStringForLogs())
     }
   }
 
@@ -90,8 +90,7 @@ object CommitAction {
     FileManagement.writeFile(".sgit/logs/refs/heads/" + branch, commit.toStringForLogs())
   }
 
-  def updateRef(commit: Commit): Unit = {
-    val currentBranch = SgitTools.getCurrentBranch()
+  def updateRef(commit: Commit, currentBranch: String): Unit = {
     if(Files.notExists(Paths.get(".sgit/refs/heads/" + currentBranch))) {
       new File(".sgit/refs/heads/" + currentBranch).createNewFile()
     }

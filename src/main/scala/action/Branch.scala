@@ -23,8 +23,13 @@ object Branch {
     } else {
       //Retrieve current commit
       val currentCommit = Source.fromFile(".sgit/refs/heads/" + currentBranch).getLines.mkString("\n")
+      //Write head into refs
       new File(".sgit/refs/heads/" + command(0)).createNewFile()
       FileManagement.writeFile(".sgit/refs/heads/" + command(0), currentCommit)
+      //Write in logs
+      val lastCommitForCurrentBranch = Source.fromFile(".sgit/logs/refs/heads/" + currentBranch).getLines.toArray.last
+      new File(".sgit/logs/refs/heads/" + command(0)).createNewFile()
+      FileManagement.writeFile(".sgit/logs/refs/heads/" + command(0), lastCommitForCurrentBranch + "::branch: Created from " + currentBranch)
     }
   }
 

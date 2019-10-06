@@ -8,7 +8,6 @@ case class Init()
 
 object Init {
   def init(): Unit = {
-    println("INIT")
     initSgitRepo()
   }
 
@@ -19,6 +18,7 @@ object Init {
       listFolders.map(folder => new File(folder).mkdirs())
       listFiles.map(file => new File(file).createNewFile())
       FileManagement.writeFile(".sgit/HEAD", "ref: refs/heads/master")
+      println("Sgit repo initialized in " + System.getProperty("user.dir").toString + "/.sgit")
     }else{
       println("Le sgit a déjà été initialisé pour ce répertoire")
     }
