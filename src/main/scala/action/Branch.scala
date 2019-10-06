@@ -3,7 +3,6 @@ package action
 import java.io.File
 import java.nio.file.{Files, Paths}
 
-import action.CommitAction.createLogDirectory
 import util.{FileManagement, SgitTools}
 
 import scala.io.Source
@@ -30,7 +29,19 @@ object Branch {
   }
 
   def branchAV(): Unit = {
-    println("BRANCH -AV")
+    if(Files.exists(Paths.get(".sgit/refs/heads"))) {
+      val currentBranch = SgitTools.getCurrentBranch()
+      val branches = FileManagement.getListOfFilesAndDirectories(".sgit/refs/heads/")
+      branches.map(branchFile => printBranch(branchFile.toString.split("/").last, Source.fromFile(branchFile).getLines.mkString("\n"), currentBranch))
+    }
+  }
+
+  def printBranch(branchName: String, lastCommit: String, currentBranch: String): Unit = {
+    if(branchName == currentBranch) {
+      println("* " + branchName + " " + lastCommit)
+    } else {
+      println("  " + branchName + " " + lastCommit)
+    }
   }
 
 }
