@@ -61,33 +61,33 @@ object Main extends App{
   def branch(command: Array[String]): Unit = command match {
     case Array("branch") => println("Vous devez préciser le nom de la branche à créer")
     case Array("branch", "-av") => Branch.branchAV()
-    case Array("branch", _) => Branch.branch(command)
+    case Array("branch", _) => Branch.branch(command.tail)
     case Array("branch", "-av", _*) => println("La commande sgit branch -av ne contient pas d'autres options")
     case default => println("Le nom de la branche à créer ne doit pas contenir d'espace. Essayez sgit branch <branch> ou sgit branch -av")
   }
 
   def checkout(command: Array[String]): Unit = command match {
     case Array("checkout") => println("Vous devez préciser le nom de la branche, du tag ou le numéro du commit sur lequel se placer")
-    case Array("checkout", _) => Checkout.checkout(command)
+    case Array("checkout", _) => Checkout.checkout(command.tail)
     case default => println("La branche, le tag ou le numéro du commit ne doivent pas contenir d'espace")
   }
 
   def tag(command: Array[String]): Unit = command match {
     case Array("tag") => println("Vous devez préciser le nom du tag")
-    case Array("tag", _) => Tag.tag(command)
+    case Array("tag", _) => Tag.tag(command.tail)
     case default => println("Le nom du tag ne doit pas contenir d'espace")
   }
 
   def merge(command: Array[String]): Unit = command match {
     case Array("merge") => println("Vous devez préciser le nom de la branche pour le merge")
-    case Array("merge", _) => Merge.merge(command)
+    case Array("merge", _) => Merge.merge(command.tail)
     case default => println("Le nom de la branche pour le merge ne doit pas contenir d'espace")
   }
 
   def rebase(command: Array[String]): Unit = command match {
     case Array("rebase") | Array("rebase", "-i") => println("Vous devez préciser le nom de la branche pour le rebase")
-    case Array("rebase", "-i", _) => Rebase.rebaseI(command)
-    case Array("rebase", _) => Rebase.rebase(command)
+    case Array("rebase", "-i", _) => Rebase.rebaseI(command.tail)
+    case Array("rebase", _) => Rebase.rebase(command.tail)
     case default => println("Le nom de la branche à créer ne doit pas contenir d'espace. Essayez sgit rebase <branch> ou sgit rebase -i <branch or commit>")
   }
 }

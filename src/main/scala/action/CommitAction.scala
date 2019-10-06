@@ -79,7 +79,7 @@ object CommitAction {
     }
     //If logs directory for the current branch exists
     else {
-      val branchFileContent = Source.fromFile(".sgit/logs/HEAD").getLines.mkString("\n")
+      val branchFileContent = Source.fromFile(".sgit/logs/refs/heads/" + branch).getLines.mkString("\n")
       FileManagement.writeFile(".sgit/logs/refs/heads/" + branch, commit.toStringForLogs() + "\n" + branchFileContent)
     }
   }

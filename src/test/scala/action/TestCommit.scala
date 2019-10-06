@@ -1,10 +1,13 @@
 package action
 
 import java.io.File
+import java.nio.file.{Files, Paths}
 
+import action.CommitAction.createLogFileForBranch
 import org.scalatest.FunSuite
 import util.FileManagement
 
+import scala.io.Source
 import scala.reflect.io.Directory
 
 class TestCommit extends FunSuite {
@@ -16,6 +19,23 @@ class TestCommit extends FunSuite {
     assert(FileManagement.getListOfFilesAndDirectories(".sgit/objects/tree").length == nbOfTreesDirs + 1)
     assert(FileManagement.getListOfFilesAndDirectories(".sgit/objects/commit").length == nbOfCommitDirs + 1)
     removeTmpDirectories()
+    removeTmpLogs()
+  }
+
+  test("sgit commit add 1 line in logs/HEAD and in logs/refs/heads/master") {
+    var nbOfCommits = 0
+    var nbOfCommitMaster = 0
+    if(Files.exists(Paths.get(".sgit/logs/HEAD"))) {
+      nbOfCommits = Source.fromFile(".sgit/logs/HEAD").getLines.length
+      if(Files.exists(Paths.get(".sgit/logs/refs/heads/master"))) {
+        nbOfCommitMaster = Source.fromFile(".sgit/logs/refs/heads/master").getLines.length
+      }
+    }
+    CommitAction.commit()
+    assert(Source.fromFile(".sgit/logs/HEAD").getLines.length == nbOfCommits + 1)
+    assert(Source.fromFile(".sgit/logs/refs/heads/master").getLines.length == nbOfCommitMaster + 1)
+    removeTmpDirectories()
+    removeTmpLogs()
   }
 
   def removeTmpDirectories(): Unit = {
@@ -30,5 +50,12 @@ class TestCommit extends FunSuite {
     if(FileManagement.getListOfFilesAndDirectories(".sgit/objects/commit/1f").isEmpty) {
       new Directory(new File(".sgit/objects/commit/1f")).deleteRecursively()
     }
+  }
+
+  def removeTmpLogs(): Unit = {
+    val linesHead = Source.fromFile(".sgit/logs/HEAD").getLines.drop(1).mkString("\n")
+    FileManagement.writeFile(".sgit/logs/HEAD", linesHead)
+    val linesMaster = Source.fromFile(".sgit/logs/refs/heads/master").getLines.drop(1).mkString("\n")
+    FileManagement.writeFile(".sgit/logs/refs/heads/master", linesMaster)
   }
 }
