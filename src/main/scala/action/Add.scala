@@ -11,7 +11,6 @@ case class Add()
 object Add {
 
   def add(command: Array[String]): Unit = {
-    println("ADD")
     command.map(elem => addElement(elem, None))
   }
 
