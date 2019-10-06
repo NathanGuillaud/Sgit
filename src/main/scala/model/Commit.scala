@@ -21,6 +21,10 @@ case class Commit(
   override def toString(): String = {
     "date " + this.date + "\n" + "author " + this.author + "\n" + "tree " + this.treeId
   }
+
+  def toStringForLogs(): String = {
+    this.id + "::" + this.author + "::" + this.date
+  }
 }
 
 object Commit {

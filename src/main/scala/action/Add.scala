@@ -53,7 +53,7 @@ object Add {
     //Get the name and the content of the file
     val decomposedFilePath = filePath.split("/")
     val fileName = decomposedFilePath(decomposedFilePath.length-1)
-    val fileContent = Source.fromFile(filePath).getLines.mkString
+    val fileContent = Source.fromFile(filePath).getLines.mkString("\n")
 
     //Hachage du fichier
     val hashValue = FileManagement.hashFile(fileName, fileContent)

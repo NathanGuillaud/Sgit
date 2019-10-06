@@ -22,6 +22,7 @@ object Init {
     if(Files.notExists(Paths.get(".sgit"))){
       listFolders.map(folder => new File(folder).mkdirs())
       listFiles.map(file => new File(file).createNewFile())
+      FileManagement.writeFile(".sgit/HEAD", "ref: refs/heads/master")
     }else{
       println("Le sgit a déjà été initialisé pour ce répertoire")
     }
