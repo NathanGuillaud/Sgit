@@ -9,10 +9,6 @@ case class Init()
 object Init {
   def init(): Unit = {
     println("INIT")
-    val directory = System.getProperty("user.dir")
-    val files = FileManagement.getListOfFilesAndDirectories(directory)
-    println(files(0))
-    println(files(1))
     initSgitRepo()
   }
 

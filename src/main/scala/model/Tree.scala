@@ -19,7 +19,7 @@ case class Tree(
   override def toString(): String = {
     var display: String = ""
     this.content.map(x => display = display + x._1 + " " + x._2 + "\n")
-    println("Contenu final du tree : " + display)
+    //println("Contenu final du tree : " + display)
     display
   }
 }

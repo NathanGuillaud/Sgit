@@ -11,8 +11,8 @@ case class Log()
 object Log {
   def log(): Unit = {
     if(Files.exists(Paths.get(".sgit/logs/HEAD")) && (Source.fromFile(".sgit/logs/HEAD").getLines.length != 0)) {
-      val commmitsArray = Source.fromFile(".sgit/logs/HEAD").getLines.toArray
-      commmitsArray.map(commitLine => printCommit(commitLine))
+      val commitsArray = Source.fromFile(".sgit/logs/HEAD").getLines.toArray
+      commitsArray.map(commitLine => printCommit(commitLine))
     } else {
       println("No commit for the moment")
     }

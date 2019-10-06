@@ -22,7 +22,7 @@ class TestCommit extends FunSuite {
     removeTmpLogs()
   }
 
-  test("sgit commit add 1 line in logs/HEAD and in logs/refs/heads/master") {
+  test("sgit commit add 1 line in logs/HEAD, logs/refs/heads/master and refs/heads/master") {
     var nbOfCommits = 0
     var nbOfCommitMaster = 0
     if(Files.exists(Paths.get(".sgit/logs/HEAD"))) {
@@ -34,6 +34,8 @@ class TestCommit extends FunSuite {
     CommitAction.commit()
     assert(Source.fromFile(".sgit/logs/HEAD").getLines.length == nbOfCommits + 1)
     assert(Source.fromFile(".sgit/logs/refs/heads/master").getLines.length == nbOfCommitMaster + 1)
+    assert(new File(".sgit/refs/heads/master").exists())
+    assert(Source.fromFile(".sgit/refs/heads/master").getLines.length == 1)
     removeTmpDirectories()
     removeTmpLogs()
   }

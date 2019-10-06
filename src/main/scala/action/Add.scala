@@ -32,7 +32,7 @@ object Add {
 
     //Tree hash
     val hashValue = tree.generateId()
-    println("Hash du tree à ajouter : " + hashValue)
+    //println("Hash du tree à ajouter : " + hashValue)
     val folderHash = hashValue.substring(0,2)
     val fileHash = hashValue.substring(2)
 
@@ -56,7 +56,7 @@ object Add {
 
     //Hachage du fichier
     val hashValue = FileManagement.hashFile(fileName, fileContent)
-    println("Hash du blob à ajouter : " + hashValue)
+    //println("Hash du blob à ajouter : " + hashValue)
     val folderHash = hashValue.substring(0,2)
     val fileHash = hashValue.substring(2)
 
