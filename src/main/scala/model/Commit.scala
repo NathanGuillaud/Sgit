@@ -12,10 +12,16 @@ case class Commit(
                  ) {
   def this(t: Tree) = this("", new Date(), "Nathan Guillaud", t.id)
 
-  def generateId(): String = {
-    val hashId = FileManagement.hashTreeOrCommit(this.toString())
-    this.id = hashId
-    hashId
+  def get_id(): String = {
+    this.id
+  }
+
+  def set_id(id: String): Unit = {
+    this.id = id
+  }
+
+  def generateId(c: Commit): String = {
+    FileManagement.hashTreeOrCommit(c.toString())
   }
 
   override def toString(): String = {

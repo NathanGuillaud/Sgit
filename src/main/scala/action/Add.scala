@@ -1,62 +1,50 @@
 package action
 
 import java.io.File
-import util.FileManagement
-import model.Tree
+import java.nio.file.{Files, Paths}
 
-import scala.io.Source
+import util.{FileManagement, SgitTools}
 
 case class Add()
 
 object Add {
 
   def add(command: Array[String]): Unit = {
-    command.map(elem => addElement(elem, None))
+    val currentBranch = SgitTools.getCurrentBranch()
+    command.map(elem => addElement(new File(elem), currentBranch))
   }
 
-  def addElement(elem: String, parent: Option[Tree]): Unit = {
-    if(new java.io.File(elem).isDirectory){
-      addTree(elem, parent)
-    } else if(new java.io.File(elem).isFile){
-      addBlob(elem, parent)
+  def addElement(path: File, currentBranch: String): Unit = {
+    if(path.isDirectory){
+      val listFiles = exploreDirectory(path)
+      listFiles.map(file => addBlob(file, currentBranch))
+    } else if(path.isFile) {
+      addBlob(path, currentBranch)
     } else {
-      println("Pas encore implémenté : " + elem)
+      println("Not implemented yet")
     }
   }
 
-  def addTree(folderPath: String, parent: Option[Tree]): Option[Tree] = {
-    val tree = new Tree()
-    //Add the content of the tree
-    val files = FileManagement.getListOfFilesAndDirectories(folderPath)
-    files.map(elem => addElement(elem.toString, Some(tree)))
-
-    //Tree hash
-    val hashValue = tree.generateId()
-    //println("Hash du tree à ajouter : " + hashValue)
-    val folderHash = hashValue.substring(0,2)
-    val fileHash = hashValue.substring(2)
-
-    //Add the tree file
-    new File(".sgit/objects/tree/" + folderHash).mkdirs()
-    new File(".sgit/objects/tree/" + folderHash + "/" + fileHash).createNewFile()
-    FileManagement.writeFile(".sgit/objects/tree/" + folderHash + "/" + fileHash, tree.toString())
-
-    //Add the tree to his parent (if he has one)
-    if(!parent.isEmpty){
-      parent.get.addElement("tree", hashValue)
-    }
-    parent
+  def exploreDirectory(path: File): List[File] = {
+    val allFiles = path.listFiles().toList
+    allFiles.flatMap(elem =>
+        if (elem.isDirectory) {
+          exploreDirectory(elem)
+        }
+        else {
+          List(elem)
+        }
+    )
   }
 
-  def addBlob(filePath: String, parent: Option[Tree]): Option[Tree] = {
+  def addBlob(path: File, currentBranch: String): Unit = {
     //Get the name and the content of the file
-    val decomposedFilePath = filePath.split("/")
+    val decomposedFilePath = path.toString().split("/")
     val fileName = decomposedFilePath(decomposedFilePath.length-1)
-    val fileContent = Source.fromFile(filePath).getLines.mkString("\n")
+    val fileContent = FileManagement.readFile(path)
 
     //Hachage du fichier
     val hashValue = FileManagement.hashFile(fileName, fileContent)
-    //println("Hash du blob à ajouter : " + hashValue)
     val folderHash = hashValue.substring(0,2)
     val fileHash = hashValue.substring(2)
 
@@ -65,11 +53,15 @@ object Add {
     new File(".sgit/objects/blob/" + folderHash + "/" + fileHash).createNewFile()
     FileManagement.writeFile(".sgit/objects/blob/" + folderHash + "/" + fileHash, fileContent)
 
-    //Ajout du blob à son parent (s'il en a un)
-    if(!parent.isEmpty){
-      parent.get.addElement("blob", hashValue)
+    addFileInStage(path, hashValue, currentBranch)
+  }
+
+  def addFileInStage(path: File, hashId: String, currentBranch: String): Unit = {
+    if(Files.notExists(Paths.get(".sgit/stages/" + currentBranch))) {
+      new File(".sgit/stages/" + currentBranch).createNewFile()
     }
-    parent
+    val stageContent = FileManagement.readFile(new File(".sgit/stages/" + currentBranch))
+    FileManagement.writeFile(".sgit/stages/" + currentBranch, stageContent + path.toString + " " + hashId + "\n")
   }
 
 }

@@ -2,8 +2,6 @@ package action
 
 import java.nio.file.{Files, Paths}
 
-import action.CommitAction.createLogFileForBranch
-
 import scala.io.Source
 
 case class Log()

@@ -2,6 +2,7 @@ package util
 
 import java.io.{BufferedWriter, File, FileWriter}
 import java.math.BigInteger
+import java.nio.file.{Files, Paths}
 import java.security.MessageDigest
 
 case class FileManagement()
@@ -30,5 +31,9 @@ object FileManagement {
 
   def hashTreeOrCommit(content: String): String = {
     String.format("%032x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(content.getBytes("UTF-8"))))
+  }
+
+  def readFile(file: File): String = {
+    new String(Files.readAllBytes(Paths.get(file.getAbsolutePath)))
   }
 }
