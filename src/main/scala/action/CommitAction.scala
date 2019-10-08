@@ -3,7 +3,7 @@ package action
 import java.io.File
 import java.nio.file.{Files, Paths}
 
-import model.{Commit, Tree}
+import model.{Commit, Tree, Element}
 import util.FileManagement
 import util.SgitTools
 import util.LogWriter
@@ -12,6 +12,7 @@ case class CommitAction()
 
 object CommitAction {
 
+  //Commit all the files add previously (on the stage)
   def commit(): Unit = {
     val currentBranch = SgitTools.getCurrentBranch()
     //If the stage is empty, nothing to commit
@@ -25,9 +26,10 @@ object CommitAction {
       val treeForCommit = new Tree()
       treeForCommit.fillWithBlobsAndTrees(rootBlobs, rootTrees)
       treeForCommit.set_id(treeForCommit.generateId())
+      treeForCommit.saveTreeFile()
 
       //Create the new commit
-      val currentCommitId = getCurrentCommit(currentBranch)
+      val currentCommitId = SgitTools.getCurrentCommit(currentBranch)
       val commit = new Commit(treeForCommit.get_id(), currentCommitId)
       commit.set_id(commit.generateId())
 
@@ -43,12 +45,9 @@ object CommitAction {
     }
   }
 
-  //Returns a list containing the path to a file that has been converted to a Blob (because it's in the STAGE) and its Hash
-  //OUTPUT is something like this:
-  //(src/main/scala/objects,a7dbb76b0406d104b116766a40f2e80a79f40a0349533017253d52ea750d9144)
-  //(src/main/scala/utils,29ee69c28399de6f830f3f0f55140ad97c211fc851240901f9e030aaaf2e13a0)
-  def getStageFiles(currentBranch: String): (List[(String,String,String)], List[(String, String)]) = {
-    var rootBlobs = List[(String, String)]()
+  //Create a list with all elements of the stage
+  def getStageFiles(currentBranch: String): (List[Element], List[Element]) = {
+    var rootBlobs = List[Element]()
     //Retrieve useful data
     val stage = new File(s".sgit${File.separator}stages${File.separator}${currentBranch}")
     val files = FileManagement.readFile(stage)
@@ -59,108 +58,87 @@ object CommitAction {
     //Cleaning from the filenames
     var paths = List[String]()
     stage_content.map(x =>
-      if(getParentPath(x(0)).isEmpty) {
-        rootBlobs = (x(0), x(1)) :: rootBlobs
+      if(SgitTools.getParentPath(x(0)).isEmpty) {
+        rootBlobs = new Element(x(0), x(1), "blob") :: rootBlobs
       } else {
-        paths = getParentPath(x(0)).get :: paths
+        paths = SgitTools.getParentPath(x(0)).get :: paths
       }
     )
     var hashs = List[String]()
     stage_content.map(x =>
-      if(!getParentPath(x(0)).isEmpty) {
+      if(!SgitTools.getParentPath(x(0)).isEmpty) {
         hashs = x(1) :: hashs
       }
     )
     val blob = List.fill(paths.size)("blob")
 
     //Merging the result
-    ((paths,hashs,blob).zipped.toList, rootBlobs)
+    var elements = List[Element]()
+    (paths,hashs,blob).zipped.toList.map(elem =>
+      elements = new Element(elem._1, elem._2, elem._3) :: elements
+    )
+    (elements, rootBlobs)
   }
 
-  //def getBlobsAtRoot(currentBranch: String):
-
-  def addTrees(l: List[(String, String, String)], rootTrees: Option[List[(String, String)]]): List[(String, String)] = {
+  //Add trees with a list of paths added
+  //Return a list with trees at root (name of the path and hash of the tree)
+  def addTrees(l: List[Element], rootTrees: Option[List[Element]]): List[Element] = {
     if(l.size == 0){
       if(rootTrees.isEmpty) {
-        List[(String, String)]()
+        List[Element]()
       } else {
         rootTrees.get
       }
     } else {
-      val (deeper, rest, parent) = getDeeperDirectory(l)
-      val hash = createTree(deeper)
-      if(parent.isEmpty) {
+      val (deeperList, restList, parentPath) = getDeeperDirectory(l)
+      val hash = createTree(deeperList)
+      if(parentPath.isEmpty) {
         if (rootTrees.isEmpty){
-          addTrees(rest, Some(List((deeper(0)._1, hash))))
+          addTrees(restList, Some(List(new Element(deeperList(0).get_path(), hash, "tree"))))
         } else {
-          addTrees(rest, Some((deeper(0)._1, hash) :: rootTrees.get))
+          addTrees(restList, Some(new Element(deeperList(0).get_path(), hash, "tree") :: rootTrees.get))
         }
       } else {
-        addTrees((parent.get, hash, "tree") :: rest, rootTrees)
+        addTrees(new Element(parentPath.get, hash, "tree") :: restList, rootTrees)
       }
     }
   }
 
-  //Return the name of the tree and the hash
-  def createTree(deeper: List[(String, String, String)]): String = {
+  //Create a tree and return his hash value
+  def createTree(deeper: List[Element]): String = {
     val tree = new Tree()
-    deeper.map(element => tree.set_content(tree.addElement(element._3, element._2, element._1)))
+    deeper.map(element => tree.set_content(tree.addElement(element.get_elem_type(), element.get_hash(), element.get_path())))
     val hash = tree.generateId()
     tree.set_id(hash)
     tree.saveTreeFile()
     tree.get_id()
   }
 
-  def getDeeperDirectory(l: List[(String, String, String)]): (List[(String,String, String)], List[(String,String, String)], Option[String]) = {
+  //Find the deeper directory of a list
+  //Return a list with entries of the deeper directory, a list with the rest and the parent path of the deeper directory
+  def getDeeperDirectory(l: List[Element]): (List[Element], List[Element], Option[String]) = {
     var max = 0
     var pathForMax = ""
 
-    l.map(line => if (line._1.split("/").size >= max) {
-      max = line._1.split("/").size
-      pathForMax = line._1
+    l.map(line => if (line.get_path().split("/").size >= max) {
+      max = line.get_path().split("/").size
+      pathForMax = line.get_path()
     })
 
-    val rest = l.filter(x => !(x._1.equals(pathForMax)))
-    val deepest = l.filter(x => x._1.equals(pathForMax))
+    val rest = l.filter(x => !(x.get_path().equals(pathForMax)))
+    val deepest = l.filter(x => x.get_path().equals(pathForMax))
 
-    val parentPath = getParentPath(pathForMax)
+    val parentPath = SgitTools.getParentPath(pathForMax)
     (deepest, rest, parentPath)
   }
 
-  def getParentPath(path: String): Option[String] = {
-    val pathSplit = path.split("/")
-    if(pathSplit.length <= 1){
-      None
-    } else {
-      var parentPath = ""
-      var first_dir = true
-      val lastValue = pathSplit.last
-      pathSplit.map(x => if(x != lastValue){
-        if(first_dir){
-          parentPath = x
-          first_dir = false
-        } else {
-          parentPath = parentPath + File.separator + x
-        }
-      })
-      Some(parentPath)
-    }
-  }
-
+  //Update references in .sgit directory
   def updateRef(commit: Commit, currentBranch: String): Unit = {
     if(Files.notExists(Paths.get(".sgit/refs/heads/" + currentBranch))) {
       new File(".sgit/refs/heads/" + currentBranch).createNewFile()
     }
     //Update the HEAD of the branch
     FileManagement.writeFile(".sgit/refs/heads/" + currentBranch, commit.id)
-  }
-
-  def getCurrentCommit(currentBranch: String): String = {
-    if(Files.exists(Paths.get(".sgit/refs/heads/" + currentBranch))) {
-      FileManagement.readFile(new File(".sgit/refs/heads/" + currentBranch))
-    } else {
-      "Nil"
-    }
   }
 
 }

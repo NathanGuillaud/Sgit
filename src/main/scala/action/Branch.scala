@@ -11,6 +11,7 @@ case class Branch()
 
 object Branch {
 
+  //Create a branch with the name of the arg
   def branch(command: Array[String]): Unit = {
     //Retrieve current branch
     val currentBranch = SgitTools.getCurrentBranch()
@@ -35,6 +36,7 @@ object Branch {
     }
   }
 
+  //List all the branches and give the current branch
   def branchAV(): Unit = {
     if(Files.exists(Paths.get(".sgit/refs/heads"))) {
       val currentBranch = SgitTools.getCurrentBranch()
@@ -43,6 +45,7 @@ object Branch {
     }
   }
 
+  //Print a branch
   def printBranch(branchName: String, lastCommit: String, currentBranch: String): Unit = {
     if(branchName == currentBranch) {
       println("* " + branchName + " " + lastCommit)

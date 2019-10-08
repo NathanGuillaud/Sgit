@@ -36,4 +36,5 @@ object FileManagement {
   def readFile(file: File): String = {
     new String(Files.readAllBytes(Paths.get(file.getAbsolutePath)))
   }
+
 }

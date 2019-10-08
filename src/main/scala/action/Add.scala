@@ -9,11 +9,13 @@ case class Add()
 
 object Add {
 
+  //Add arguments in the stage
   def add(command: Array[String]): Unit = {
     val currentBranch = SgitTools.getCurrentBranch()
     command.map(elem => addElement(new File(elem), currentBranch))
   }
 
+  //Add one element to the stage (file or directory)
   def addElement(path: File, currentBranch: String): Unit = {
     if(path.isDirectory){
       val listFiles = exploreDirectory(path)
@@ -25,6 +27,7 @@ object Add {
     }
   }
 
+  //Get all the files for a directory (recursively)
   def exploreDirectory(path: File): List[File] = {
     val allFiles = path.listFiles().toList
     allFiles.flatMap(elem =>
@@ -37,6 +40,7 @@ object Add {
     )
   }
 
+  //Add a blob
   def addBlob(path: File, currentBranch: String): Unit = {
     //Get the name and the content of the file
     val decomposedFilePath = path.toString().split("/")
@@ -56,6 +60,7 @@ object Add {
     addFileInStage(path, hashValue, currentBranch)
   }
 
+  //Add a file to the stage
   def addFileInStage(path: File, hashId: String, currentBranch: String): Unit = {
     if(Files.notExists(Paths.get(".sgit/stages/" + currentBranch))) {
       new File(".sgit/stages/" + currentBranch).createNewFile()
@@ -68,6 +73,7 @@ object Add {
     FileManagement.writeFile(".sgit/stages/" + currentBranch, stageContent + path.toString + " " + hashId + "\n")
   }
 
+  //Remove a file from the stage if the file exists on the stage
   def removeFileFromStage(filePath: String, currentBranch: String): Unit = {
     val stage = new File(s".sgit${File.separator}stages${File.separator}${currentBranch}")
     val files = FileManagement.readFile(stage)
