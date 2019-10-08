@@ -54,9 +54,9 @@ case class Tree(
     val treeFileHash = treeHashValue.substring(2)
 
     //Add the tree file
-    new File(".sgit/objects/tree/" + treeFolderHash).mkdirs()
-    new File(".sgit/objects/tree/" + treeFolderHash + "/" + treeFileHash).createNewFile()
-    FileManagement.writeFile(".sgit/objects/tree/" + treeFolderHash + "/" + treeFileHash, this.toString())
+    new File(s".sgit${File.separator}objects${File.separator}tree${File.separator}${treeFolderHash}").mkdirs()
+    new File(s".sgit${File.separator}objects${File.separator}tree${File.separator}${treeFolderHash}${File.separator}${treeFileHash}").createNewFile()
+    FileManagement.writeFile(s".sgit${File.separator}objects${File.separator}tree${File.separator}${treeFolderHash}${File.separator}${treeFileHash}", this.toString())
   }
 }
 

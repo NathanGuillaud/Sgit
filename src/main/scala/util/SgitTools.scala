@@ -10,15 +10,15 @@ case class SgitTools()
 object SgitTools {
 
   def getCurrentBranch(): String = {
-    val headFileContent = Source.fromFile(".sgit/HEAD").getLines.mkString("\n")
+    val headFileContent = Source.fromFile(s".sgit${File.separator}HEAD").getLines.mkString("\n")
     val contentSplit = headFileContent.split("/")
     contentSplit.last
   }
 
   //Get the current commit from references files
   def getCurrentCommit(currentBranch: String): String = {
-    if(Files.exists(Paths.get(".sgit/refs/heads/" + currentBranch))) {
-      FileManagement.readFile(new File(".sgit/refs/heads/" + currentBranch))
+    if(Files.exists(Paths.get(s".sgit${File.separator}refs${File.separator}heads${File.separator}${currentBranch}"))) {
+      FileManagement.readFile(new File(s".sgit${File.separator}refs${File.separator}heads${File.separator}${currentBranch}"))
     } else {
       "Nil"
     }

@@ -1,5 +1,6 @@
 package action
 
+import java.io.File
 import java.nio.file.{Files, Paths}
 
 import scala.io.Source
@@ -8,8 +9,8 @@ case class Log()
 
 object Log {
   def log(): Unit = {
-    if(Files.exists(Paths.get(".sgit/logs/HEAD")) && (Source.fromFile(".sgit/logs/HEAD").getLines.length != 0)) {
-      val commitsArray = Source.fromFile(".sgit/logs/HEAD").getLines.toArray
+    if(Files.exists(Paths.get(s".sgit${File.separator}logs${File.separator}HEAD")) && (Source.fromFile(s".sgit${File.separator}logs${File.separator}HEAD").getLines.length != 0)) {
+      val commitsArray = Source.fromFile(s".sgit${File.separator}logs${File.separator}HEAD").getLines.toArray
       commitsArray.map(commitLine => printCommit(commitLine))
     } else {
       println("No commit for the moment")

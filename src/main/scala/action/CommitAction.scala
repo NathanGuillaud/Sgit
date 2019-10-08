@@ -16,7 +16,7 @@ object CommitAction {
   def commit(): Unit = {
     val currentBranch = SgitTools.getCurrentBranch()
     //If the stage is empty, nothing to commit
-    if(FileManagement.readFile(new File(s".sgit/stages/${currentBranch}")) == "") {
+    if(FileManagement.readFile(new File(s".sgit${File.separator}stages${File.separator}${currentBranch}")) == "") {
       println("Nothing to commit")
     } else {
       val (stage, rootBlobs) = getStageFiles(currentBranch)
@@ -39,7 +39,7 @@ object CommitAction {
       commit.saveCommitFile()
 
       //Delete content from the stage of the current branch
-      FileManagement.writeFile(".sgit/stages/" + currentBranch, "")
+      FileManagement.writeFile(s".sgit${File.separator}stages${File.separator}${currentBranch}", "")
 
       println("[" + currentBranch + " " + commit.id + "]")
     }
@@ -81,7 +81,7 @@ object CommitAction {
   }
 
   //Add trees with a list of paths added
-  //Return a list with trees at root (name of the path and hash of the tree)
+  //Return a list of trees at root
   def addTrees(l: List[Element], rootTrees: Option[List[Element]]): List[Element] = {
     if(l.size == 0){
       if(rootTrees.isEmpty) {
@@ -134,11 +134,11 @@ object CommitAction {
 
   //Update references in .sgit directory
   def updateRef(commit: Commit, currentBranch: String): Unit = {
-    if(Files.notExists(Paths.get(".sgit/refs/heads/" + currentBranch))) {
-      new File(".sgit/refs/heads/" + currentBranch).createNewFile()
+    if(Files.notExists(Paths.get(s".sgit${File.separator}refs${File.separator}heads${File.separator}${currentBranch}"))) {
+      new File(s".sgit${File.separator}refs${File.separator}heads${File.separator}${currentBranch}").createNewFile()
     }
     //Update the HEAD of the branch
-    FileManagement.writeFile(".sgit/refs/heads/" + currentBranch, commit.id)
+    FileManagement.writeFile(s".sgit${File.separator}refs${File.separator}heads${File.separator}${currentBranch}", commit.id)
   }
 
 }

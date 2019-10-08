@@ -53,24 +53,24 @@ object Add {
     val fileHash = hashValue.substring(2)
 
     //Création du blob dans son répertoire
-    new File(".sgit/objects/blob/" + folderHash).mkdirs()
-    new File(".sgit/objects/blob/" + folderHash + "/" + fileHash).createNewFile()
-    FileManagement.writeFile(".sgit/objects/blob/" + folderHash + "/" + fileHash, fileContent)
+    new File(s".sgit${File.separator}objects${File.separator}blob${File.separator}${folderHash}").mkdirs()
+    new File(s".sgit${File.separator}objects${File.separator}blob${File.separator}${folderHash}${File.separator}${fileHash}").createNewFile()
+    FileManagement.writeFile(s".sgit${File.separator}objects${File.separator}blob${File.separator}${folderHash}/${fileHash}", fileContent)
 
     addFileInStage(path, hashValue, currentBranch)
   }
 
   //Add a file to the stage
   def addFileInStage(path: File, hashId: String, currentBranch: String): Unit = {
-    if(Files.notExists(Paths.get(".sgit/stages/" + currentBranch))) {
-      new File(".sgit/stages/" + currentBranch).createNewFile()
+    if(Files.notExists(Paths.get(s".sgit${File.separator}stages${File.separator}${currentBranch}"))) {
+      new File(s".sgit${File.separator}stages${File.separator}${currentBranch}").createNewFile()
     } else {
       //Remove the last version of the file from the stage
       removeFileFromStage(path.toString, currentBranch)
     }
     //Add the new version of the file to the stage
-    val stageContent = FileManagement.readFile(new File(".sgit/stages/" + currentBranch))
-    FileManagement.writeFile(".sgit/stages/" + currentBranch, stageContent + path.toString + " " + hashId + "\n")
+    val stageContent = FileManagement.readFile(new File(s".sgit${File.separator}stages${File.separator}" + currentBranch))
+    FileManagement.writeFile(s".sgit${File.separator}stages${File.separator}${currentBranch}", stageContent + path.toString + " " + hashId + "\n")
   }
 
   //Remove a file from the stage if the file exists on the stage

@@ -15,32 +15,32 @@ object Branch {
   def branch(command: Array[String]): Unit = {
     //Retrieve current branch
     val currentBranch = SgitTools.getCurrentBranch()
-    if(Files.notExists(Paths.get(".sgit/refs/heads/" + currentBranch))) {
+    if(Files.notExists(Paths.get(s".sgit${File.separator}refs${File.separator}heads${File.separator}${currentBranch}"))) {
       println("You have to make a first commit before create a new branch")
     }
     //If the branch already exists
-    else if(Files.exists(Paths.get(".sgit/refs/heads/" + command(0)))){
+    else if(Files.exists(Paths.get(s".sgit${File.separator}refs${File.separator}heads${File.separator}${command(0)}"))){
       println("The branch " + command(0) + " already exists")
     } else {
       //Retrieve current commit
-      val currentCommit = Source.fromFile(".sgit/refs/heads/" + currentBranch).getLines.mkString("\n")
+      val currentCommit = Source.fromFile(s".sgit${File.separator}refs${File.separator}heads${File.separator}${currentBranch}").getLines.mkString("\n")
       //Create new file for stage
-      new File(s".sgit/stages/${command(0)}").createNewFile()
+      new File(s".sgit${File.separator}stages${File.separator}${command(0)}").createNewFile()
       //Write head into refs
-      new File(".sgit/refs/heads/" + command(0)).createNewFile()
-      FileManagement.writeFile(".sgit/refs/heads/" + command(0), currentCommit)
+      new File(s".sgit${File.separator}refs${File.separator}heads${File.separator}${command(0)}").createNewFile()
+      FileManagement.writeFile(s".sgit${File.separator}refs${File.separator}heads${File.separator}${command(0)}", currentCommit)
       //Write in logs
-      val lastCommitForCurrentBranch = Source.fromFile(".sgit/logs/refs/heads/" + currentBranch).getLines.toArray.last
-      new File(".sgit/logs/refs/heads/" + command(0)).createNewFile()
-      FileManagement.writeFile(".sgit/logs/refs/heads/" + command(0), lastCommitForCurrentBranch + "::branch: Created from " + currentBranch)
+      val lastCommitForCurrentBranch = Source.fromFile(s".sgit${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${currentBranch}").getLines.toArray.last
+      new File(s".sgit${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${command(0)}").createNewFile()
+      FileManagement.writeFile(s".sgit${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${command(0)}", lastCommitForCurrentBranch + "::branch: Created from " + currentBranch)
     }
   }
 
   //List all the branches and give the current branch
   def branchAV(): Unit = {
-    if(Files.exists(Paths.get(".sgit/refs/heads"))) {
+    if(Files.exists(Paths.get(s".sgit${File.separator}refs${File.separator}heads"))) {
       val currentBranch = SgitTools.getCurrentBranch()
-      val branches = FileManagement.getListOfFilesAndDirectories(".sgit/refs/heads/")
+      val branches = FileManagement.getListOfFilesAndDirectories(s".sgit${File.separator}refs${File.separator}heads${File.separator}")
       branches.map(branchFile => printBranch(branchFile.toString.split("/").last, Source.fromFile(branchFile).getLines.mkString("\n"), currentBranch))
     }
   }
