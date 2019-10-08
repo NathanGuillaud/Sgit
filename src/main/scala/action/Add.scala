@@ -59,9 +59,29 @@ object Add {
   def addFileInStage(path: File, hashId: String, currentBranch: String): Unit = {
     if(Files.notExists(Paths.get(".sgit/stages/" + currentBranch))) {
       new File(".sgit/stages/" + currentBranch).createNewFile()
+    } else {
+      //Remove the last version of the file from the stage
+      removeFileFromStage(path.toString, currentBranch)
     }
+    //Add the new version of the file to the stage
     val stageContent = FileManagement.readFile(new File(".sgit/stages/" + currentBranch))
     FileManagement.writeFile(".sgit/stages/" + currentBranch, stageContent + path.toString + " " + hashId + "\n")
+  }
+
+  def removeFileFromStage(filePath: String, currentBranch: String): Unit = {
+    val stage = new File(s".sgit${File.separator}stages${File.separator}${currentBranch}")
+    val files = FileManagement.readFile(stage)
+    val stageContent = files.split("\n").map(x => x.split(" "))
+    if(stageContent.length > 0 && files != "") {
+      var newContent = ""
+      stageContent.map(line =>
+        if(line(0) != filePath) {
+          newContent = newContent + line(0) + " " + line(1) + "\n"
+        }
+      )
+      //Write new content in stage
+      FileManagement.writeFile(s".sgit${File.separator}stages${File.separator}${currentBranch}", newContent)
+    }
   }
 
 }
