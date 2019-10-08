@@ -29,19 +29,27 @@ case class Tree(
     (elementType, id, name) :: get_content()
   }
 
-  def generateId(t: Tree): String = {
-    FileManagement.hashTreeOrCommit(t.toString())
+  def generateId(): String = {
+    FileManagement.hashTreeOrCommit(this.toString())
+  }
+
+  def fillWithBlobsAndTrees(blobs: List[(String, String)], trees: List[(String, String)]): Unit = {
+    trees.map(t =>
+      this.set_content(this.addElement("tree", t._2, t._1))
+    )
+    blobs.map(t =>
+      this.set_content(this.addElement("blob", t._2, t._1))
+    )
   }
 
   override def toString(): String = {
     var display: String = ""
-    this.content.map(x => display = display + x._1 + " " + x._2 + " " + x._3 + "\n")
+    this.get_content().map(x => display = display + x._1 + " " + x._2 + " " + x._3 + "\n")
     display
   }
 
   def saveTreeFile(): Unit = {
     val treeHashValue = this.get_id()
-    //println("Hash du tree à ajouter : " + treeHashValue)
     val treeFolderHash = treeHashValue.substring(0,2)
     val treeFileHash = treeHashValue.substring(2)
 
@@ -56,4 +64,6 @@ object Tree {
   def apply(): Tree = {
     new Tree
   }
+
+
 }

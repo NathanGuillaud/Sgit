@@ -1,10 +1,12 @@
 package action
 
 import java.io.File
+import java.nio.file.{Files, Paths}
 
-import model.Tree
+import model.{Commit, Tree}
 import util.FileManagement
 import util.SgitTools
+import util.LogWriter
 
 case class CommitAction()
 
@@ -12,21 +14,41 @@ object CommitAction {
 
   def commit(): Unit = {
     val currentBranch = SgitTools.getCurrentBranch()
-    val (stage, rootBlobs) = getStageFiles(currentBranch)
-    val rootTrees = addTrees(stage, None)
-    println("Contenu du tree du commit :")
-    println("-------Blobs :")
-    rootBlobs.map(x => println(x))
-    println("-------Trees :")
-    rootTrees.map(x => println(x))
+    //If the stage is empty, nothing to commit
+    if(FileManagement.readFile(new File(s".sgit/stages/${currentBranch}")) == "") {
+      println("Nothing to commit")
+    } else {
+      val (stage, rootBlobs) = getStageFiles(currentBranch)
+      val rootTrees = addTrees(stage, None)
+
+      //Create the tree for commit
+      val treeForCommit = new Tree()
+      treeForCommit.fillWithBlobsAndTrees(rootBlobs, rootTrees)
+      treeForCommit.set_id(treeForCommit.generateId())
+
+      //Create the new commit
+      val currentCommitId = getCurrentCommit(currentBranch)
+      val commit = new Commit(treeForCommit.get_id(), currentCommitId)
+      commit.set_id(commit.generateId())
+
+      //Write commit in logs, refs and objects
+      LogWriter.updateLogs(commit, currentBranch)
+      updateRef(commit, currentBranch)
+      commit.saveCommitFile()
+
+      //Delete content from the stage of the current branch
+      FileManagement.writeFile(".sgit/stages/" + currentBranch, "")
+
+      println("[" + currentBranch + " " + commit.id + "]")
+    }
   }
 
   //Returns a list containing the path to a file that has been converted to a Blob (because it's in the STAGE) and its Hash
   //OUTPUT is something like this:
   //(src/main/scala/objects,a7dbb76b0406d104b116766a40f2e80a79f40a0349533017253d52ea750d9144)
   //(src/main/scala/utils,29ee69c28399de6f830f3f0f55140ad97c211fc851240901f9e030aaaf2e13a0)
-  def getStageFiles(currentBranch: String): (List[(String,String,String)], List[String]) = {
-    var rootBlobs = List[String]()
+  def getStageFiles(currentBranch: String): (List[(String,String,String)], List[(String, String)]) = {
+    var rootBlobs = List[(String, String)]()
     //Retrieve useful data
     val stage = new File(s".sgit${File.separator}stages${File.separator}${currentBranch}")
     val files = FileManagement.readFile(stage)
@@ -38,7 +60,7 @@ object CommitAction {
     var paths = List[String]()
     stage_content.map(x =>
       if(getParentPath(x(0)).isEmpty) {
-        rootBlobs = x(1) :: rootBlobs
+        rootBlobs = (x(0), x(1)) :: rootBlobs
       } else {
         paths = getParentPath(x(0)).get :: paths
       }
@@ -55,29 +77,35 @@ object CommitAction {
     ((paths,hashs,blob).zipped.toList, rootBlobs)
   }
 
-  def addTrees(l: List[(String, String, String)], hashFinal: Option[List[String]]): List[String] = {
+  //def getBlobsAtRoot(currentBranch: String):
+
+  def addTrees(l: List[(String, String, String)], rootTrees: Option[List[(String, String)]]): List[(String, String)] = {
     if(l.size == 0){
-      hashFinal.get
+      if(rootTrees.isEmpty) {
+        List[(String, String)]()
+      } else {
+        rootTrees.get
+      }
     } else {
       val (deeper, rest, parent) = getDeeperDirectory(l)
       val hash = createTree(deeper)
       if(parent.isEmpty) {
-        if (hashFinal.isEmpty){
-          addTrees(rest, Some(List(hash)))
+        if (rootTrees.isEmpty){
+          addTrees(rest, Some(List((deeper(0)._1, hash))))
         } else {
-          addTrees(rest, Some(hash :: hashFinal.get))
+          addTrees(rest, Some((deeper(0)._1, hash) :: rootTrees.get))
         }
       } else {
-        addTrees((parent.get, hash, "tree") :: rest, hashFinal)
+        addTrees((parent.get, hash, "tree") :: rest, rootTrees)
       }
     }
   }
 
+  //Return the name of the tree and the hash
   def createTree(deeper: List[(String, String, String)]): String = {
     val tree = new Tree()
-    deeper.map(x => println(x))
     deeper.map(element => tree.set_content(tree.addElement(element._3, element._2, element._1)))
-    val hash = tree.generateId(tree)
+    val hash = tree.generateId()
     tree.set_id(hash)
     tree.saveTreeFile()
     tree.get_id()
@@ -116,6 +144,22 @@ object CommitAction {
         }
       })
       Some(parentPath)
+    }
+  }
+
+  def updateRef(commit: Commit, currentBranch: String): Unit = {
+    if(Files.notExists(Paths.get(".sgit/refs/heads/" + currentBranch))) {
+      new File(".sgit/refs/heads/" + currentBranch).createNewFile()
+    }
+    //Update the HEAD of the branch
+    FileManagement.writeFile(".sgit/refs/heads/" + currentBranch, commit.id)
+  }
+
+  def getCurrentCommit(currentBranch: String): String = {
+    if(Files.exists(Paths.get(".sgit/refs/heads/" + currentBranch))) {
+      FileManagement.readFile(new File(".sgit/refs/heads/" + currentBranch))
+    } else {
+      "Nil"
     }
   }
 

@@ -23,6 +23,8 @@ object Branch {
     } else {
       //Retrieve current commit
       val currentCommit = Source.fromFile(".sgit/refs/heads/" + currentBranch).getLines.mkString("\n")
+      //Create new file for stage
+      new File(s".sgit/stages/${command(0)}").createNewFile()
       //Write head into refs
       new File(".sgit/refs/heads/" + command(0)).createNewFile()
       FileManagement.writeFile(".sgit/refs/heads/" + command(0), currentCommit)
