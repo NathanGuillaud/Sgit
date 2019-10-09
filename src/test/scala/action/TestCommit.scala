@@ -16,13 +16,13 @@ class TestCommit extends FunSuite {
     createTmpDirectories()
     val currentBranch = SgitTools.getCurrentBranch()
     val currentCommit = SgitTools.getCurrentCommit(currentBranch)
-    val nbOfTree = FileManagement.exploreDirectory(new File(s".sgit${File.separator}objects${File.separator}tree")).length
+    val nbOfTree = FileManagement.getFilesFromDirectory(new File(s".sgit${File.separator}objects${File.separator}tree")).length
     SgitTools.clearStage(currentBranch)
     Add.add(Array("testCommit", "rootTestCommit.txt"))
 
     CommitAction.commit()
 
-    assert(FileManagement.exploreDirectory(new File(s".sgit${File.separator}objects${File.separator}tree")).length == nbOfTree + 2)
+    assert(FileManagement.getFilesFromDirectory(new File(s".sgit${File.separator}objects${File.separator}tree")).length == nbOfTree + 2)
 
     removeTmpDirectories()
     removeTmpLogs(currentBranch)
@@ -34,13 +34,13 @@ class TestCommit extends FunSuite {
     createTmpDirectories()
     val currentBranch = SgitTools.getCurrentBranch()
     val currentCommit = SgitTools.getCurrentCommit(currentBranch)
-    val nbOfCommit = FileManagement.exploreDirectory(new File(s".sgit${File.separator}objects${File.separator}commit")).length
+    val nbOfCommit = FileManagement.getFilesFromDirectory(new File(s".sgit${File.separator}objects${File.separator}commit")).length
     SgitTools.clearStage(currentBranch)
     Add.add(Array("rootTestCommit.txt"))
 
     CommitAction.commit()
 
-    assert(FileManagement.exploreDirectory(new File(s".sgit${File.separator}objects${File.separator}commit")).length == nbOfCommit + 1)
+    assert(FileManagement.getFilesFromDirectory(new File(s".sgit${File.separator}objects${File.separator}commit")).length == nbOfCommit + 1)
 
     removeTmpDirectories()
     removeTmpLogs(currentBranch)

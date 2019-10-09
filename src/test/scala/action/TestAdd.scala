@@ -12,11 +12,11 @@ class TestAdd extends FunSuite {
     Init.init()
     val currentBranch = SgitTools.getCurrentBranch()
     createTmpDirectory()
-    val nbOfBlobDirs = FileManagement.exploreDirectory(new File(s".sgit${File.separator}objects${File.separator}blob")).length
+    val nbOfBlobDirs = FileManagement.getFilesFromDirectory(new File(s".sgit${File.separator}objects${File.separator}blob")).length
 
     Add.add(Array("testAdd", "rootTestAdd.txt"))
 
-    assert(FileManagement.exploreDirectory(new File(s".sgit${File.separator}objects${File.separator}blob")).length == nbOfBlobDirs + 3)
+    assert(FileManagement.getFilesFromDirectory(new File(s".sgit${File.separator}objects${File.separator}blob")).length == nbOfBlobDirs + 3)
 
     removeTmpDirectories()
     SgitTools.clearStage(currentBranch)

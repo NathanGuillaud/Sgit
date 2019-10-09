@@ -33,8 +33,6 @@ object CommitAction {
       val commit = new Commit(treeForCommit.get_id(), currentCommitId)
       commit.set_id(commit.generateId())
 
-      println("COMMIT ID : " + commit.get_id())
-
       //Write commit in logs, refs and objects
       LogWriter.updateLogs(commit, currentBranch)
       SgitTools.updateRef(commit.get_id(), currentBranch)

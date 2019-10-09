@@ -38,11 +38,11 @@ object FileManagement {
   }
 
   //Get all the files for a directory (recursively)
-  def exploreDirectory(path: File): List[File] = {
+  def getFilesFromDirectory(path: File): List[File] = {
     val allFiles = path.listFiles().toList
     allFiles.flatMap(elem =>
       if (elem.isDirectory) {
-        exploreDirectory(elem)
+        getFilesFromDirectory(elem)
       }
       else {
         List(elem)
