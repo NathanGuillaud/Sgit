@@ -7,8 +7,6 @@ import util.{FileManagement, SgitTools}
 
 import scala.io.Source
 
-case class Tag()
-
 object Tag {
   def tag(command: Array[String]): Unit = {
     val currentBranch = SgitTools.getCurrentBranch()
@@ -21,7 +19,7 @@ object Tag {
       println("The tag " + command(0) + " already exists")
     } else {
       //Retrieve current commit
-      val currentCommit = Source.fromFile(s".sgit${File.separator}refs${File.separator}heads${File.separator}${currentBranch}").getLines.mkString("\n")
+      val currentCommit = SgitTools.getCurrentCommit(currentBranch)
       //Write head into refs
       new File(pathTags + s"${File.separator}${command(0)}").createNewFile()
       FileManagement.writeFile(pathTags + s"${File.separator}${command(0)}", currentCommit)

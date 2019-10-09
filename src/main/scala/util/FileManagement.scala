@@ -5,8 +5,6 @@ import java.math.BigInteger
 import java.nio.file.{Files, Paths}
 import java.security.MessageDigest
 
-case class FileManagement()
-
 object FileManagement {
   def getListOfFilesAndDirectories(dir: String):List[File] = {
     val d = new File(dir)

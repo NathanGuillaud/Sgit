@@ -5,9 +5,8 @@ import java.nio.file.{Files, Paths}
 
 import scala.io.Source
 
-case class Log()
-
 object Log {
+
   def log(): Unit = {
     val pathLogsHead = s".sgit${File.separator}logs${File.separator}HEAD"
     if(Files.exists(Paths.get(pathLogsHead)) && (Source.fromFile(pathLogsHead).getLines.length != 0)) {
@@ -31,4 +30,5 @@ object Log {
   def logStat(): Unit = {
     println("LOG --STAT")
   }
+
 }

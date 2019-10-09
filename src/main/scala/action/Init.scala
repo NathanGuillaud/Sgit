@@ -4,9 +4,8 @@ import java.io.File
 import java.nio.file.{Files, Paths}
 import util.FileManagement
 
-case class Init()
-
 object Init {
+
   def init(): Unit = {
     initSgitRepo()
   }
@@ -23,4 +22,5 @@ object Init {
       println("Le sgit a déjà été initialisé pour ce répertoire")
     }
   }
+
 }

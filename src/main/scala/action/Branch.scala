@@ -7,8 +7,6 @@ import util.{FileManagement, SgitTools}
 
 import scala.io.Source
 
-case class Branch()
-
 object Branch {
 
   //Create a branch with the name of the arg

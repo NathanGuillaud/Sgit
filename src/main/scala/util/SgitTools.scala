@@ -3,11 +3,7 @@ package util
 import java.io.File
 import java.nio.file.{Files, Paths}
 
-import model.Commit
-
 import scala.io.Source
-
-case class SgitTools()
 
 object SgitTools {
 

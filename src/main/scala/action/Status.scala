@@ -4,8 +4,6 @@ import java.io.File
 
 import util.{FileManagement, SgitTools}
 
-case class Status()
-
 object Status {
    def status(): Unit = {
      val currentBranch = SgitTools.getCurrentBranch()

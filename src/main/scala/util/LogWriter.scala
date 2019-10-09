@@ -5,8 +5,6 @@ import java.nio.file.{Files, Paths}
 
 import model.Commit
 
-case class LogWriter()
-
 object LogWriter {
   def updateLogs(commit: Commit, currentBranch: String): Unit ={
     //If logs directory not exists

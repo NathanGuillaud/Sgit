@@ -1,14 +1,11 @@
 package action
 
 import java.io.File
-import java.nio.file.{Files, Paths}
 
 import model.{Commit, Tree, Element}
 import util.FileManagement
 import util.SgitTools
 import util.LogWriter
-
-case class CommitAction()
 
 object CommitAction {
 
