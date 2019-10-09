@@ -15,8 +15,9 @@ object CommitAction {
   //Commit all the files add previously (on the stage)
   def commit(): Unit = {
     val currentBranch = SgitTools.getCurrentBranch()
+    val pathBranchstage = s".sgit${File.separator}stages${File.separator}${currentBranch}"
     //If the stage is empty, nothing to commit
-    if(FileManagement.readFile(new File(s".sgit${File.separator}stages${File.separator}${currentBranch}")) == "") {
+    if(FileManagement.readFile(new File(pathBranchstage)) == "") {
       println("Nothing to commit")
     } else {
       val (stage, rootBlobs) = getStageFiles(currentBranch)
@@ -39,7 +40,7 @@ object CommitAction {
       commit.saveCommitFile()
 
       //Delete content from the stage of the current branch
-      FileManagement.writeFile(s".sgit${File.separator}stages${File.separator}${currentBranch}", "")
+      FileManagement.writeFile(pathBranchstage, "")
 
       println("[" + currentBranch + " " + commit.id + "]")
     }

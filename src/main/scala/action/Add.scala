@@ -40,29 +40,32 @@ object Add {
     val fileHash = hashValue.substring(2)
 
     //Création du blob dans son répertoire
-    new File(s".sgit${File.separator}objects${File.separator}blob${File.separator}${folderHash}").mkdirs()
-    new File(s".sgit${File.separator}objects${File.separator}blob${File.separator}${folderHash}${File.separator}${fileHash}").createNewFile()
-    FileManagement.writeFile(s".sgit${File.separator}objects${File.separator}blob${File.separator}${folderHash}/${fileHash}", fileContent)
+    val blobDirectory = s".sgit${File.separator}objects${File.separator}blob${File.separator}${folderHash}"
+    new File(blobDirectory).mkdirs()
+    new File(blobDirectory + s"${File.separator}${fileHash}").createNewFile()
+    FileManagement.writeFile(blobDirectory + s"${File.separator}${fileHash}", fileContent)
 
     addFileInStage(path, hashValue, currentBranch)
   }
 
   //Add a file to the stage
   def addFileInStage(path: File, hashId: String, currentBranch: String): Unit = {
-    if(Files.notExists(Paths.get(s".sgit${File.separator}stages${File.separator}${currentBranch}"))) {
-      new File(s".sgit${File.separator}stages${File.separator}${currentBranch}").createNewFile()
+    val pathBranchStage = s".sgit${File.separator}stages${File.separator}${currentBranch}"
+    if(Files.notExists(Paths.get(pathBranchStage))) {
+      new File(pathBranchStage).createNewFile()
     } else {
       //Remove the last version of the file from the stage
       removeFileFromStage(path.toString, currentBranch)
     }
     //Add the new version of the file to the stage
     val stageContent = FileManagement.readFile(new File(s".sgit${File.separator}stages${File.separator}" + currentBranch))
-    FileManagement.writeFile(s".sgit${File.separator}stages${File.separator}${currentBranch}", stageContent + path.toString + " " + hashId + "\n")
+    FileManagement.writeFile(pathBranchStage, stageContent + path.toString + " " + hashId + "\n")
   }
 
   //Remove a file from the stage if the file exists on the stage
   def removeFileFromStage(filePath: String, currentBranch: String): Unit = {
-    val stage = new File(s".sgit${File.separator}stages${File.separator}${currentBranch}")
+    val pathBranchStage = s".sgit${File.separator}stages${File.separator}${currentBranch}"
+    val stage = new File(pathBranchStage)
     val files = FileManagement.readFile(stage)
     val stageContent = files.split("\n").map(x => x.split(" "))
     if(stageContent.length > 0 && files != "") {
@@ -73,7 +76,7 @@ object Add {
         }
       )
       //Write new content in stage
-      FileManagement.writeFile(s".sgit${File.separator}stages${File.separator}${currentBranch}", newContent)
+      FileManagement.writeFile(pathBranchStage, newContent)
     }
   }
 

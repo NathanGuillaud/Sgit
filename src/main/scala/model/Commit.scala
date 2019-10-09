@@ -56,9 +56,10 @@ case class Commit(
     val commitFileHash = commitHashValue.substring(2)
 
     //Add the tree file
-    new File(s".sgit${File.separator}objects${File.separator}commit${File.separator}${commitFolderHash}").mkdirs()
-    new File(s".sgit${File.separator}objects${File.separator}commit${File.separator}${commitFolderHash}${File.separator}${commitFileHash}").createNewFile()
-    FileManagement.writeFile(s".sgit${File.separator}objects${File.separator}commit${File.separator}${commitFolderHash}${File.separator}${commitFileHash}", this.toString())
+    val pathCommitDirectory = s".sgit${File.separator}objects${File.separator}commit${File.separator}${commitFolderHash}"
+    new File(pathCommitDirectory).mkdirs()
+    new File(pathCommitDirectory + s"${File.separator}${commitFileHash}").createNewFile()
+    FileManagement.writeFile(pathCommitDirectory + s"${File.separator}${commitFileHash}", this.toString())
   }
 }
 

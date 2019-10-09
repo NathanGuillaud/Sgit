@@ -9,8 +9,9 @@ case class Log()
 
 object Log {
   def log(): Unit = {
-    if(Files.exists(Paths.get(s".sgit${File.separator}logs${File.separator}HEAD")) && (Source.fromFile(s".sgit${File.separator}logs${File.separator}HEAD").getLines.length != 0)) {
-      val commitsArray = Source.fromFile(s".sgit${File.separator}logs${File.separator}HEAD").getLines.toArray
+    val pathLogsHead = s".sgit${File.separator}logs${File.separator}HEAD"
+    if(Files.exists(Paths.get(pathLogsHead)) && (Source.fromFile(pathLogsHead).getLines.length != 0)) {
+      val commitsArray = Source.fromFile(pathLogsHead).getLines.toArray
       commitsArray.map(commitLine => printCommit(commitLine))
     } else {
       println("No commit for the moment")
@@ -19,7 +20,8 @@ object Log {
 
   def printCommit(commitLine: String): Unit = {
     val commitValues = commitLine.split("::")
-    println("commit " + commitValues(0) + "\n" + "author: " + commitValues(1) + "\n" + "date: " + commitValues(2) + "\n")
+    println(Console.YELLOW + "commit:" + "\t" + commitValues(0))
+    println(Console.WHITE + "author:" + "\t" + commitValues(1) + "\n" + "date:" + "\t" + commitValues(2) + "\n")
   }
 
   def logP(): Unit = {
