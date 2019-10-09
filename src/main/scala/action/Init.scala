@@ -12,7 +12,7 @@ object Init {
   }
 
   def initSgitRepo(): Unit ={
-    val listFolders = List(".sgit", s".sgit${File.separator}objects${File.separator}tree", s".sgit${File.separator}objects${File.separator}blob", s".sgit${File.separator}objects${File.separator}commit", s".sgit${File.separator}branches", s".sgit${File.separator}config", s".sgit${File.separator}refs${File.separator}heads", s".sgit${File.separator}refs${File.separator}tags", s".sgit${File.separator}stages")
+    val listFolders = List(".sgit", s".sgit${File.separator}objects${File.separator}tree", s".sgit${File.separator}objects${File.separator}blob", s".sgit${File.separator}objects${File.separator}commit", s".sgit${File.separator}config", s".sgit${File.separator}refs${File.separator}heads", s".sgit${File.separator}refs${File.separator}tags", s".sgit${File.separator}stages")
     val listFiles = List(s".sgit${File.separator}HEAD", s".sgit${File.separator}stages${File.separator}master")
     if(Files.notExists(Paths.get(".sgit"))){
       listFolders.map(folder => new File(folder).mkdirs())

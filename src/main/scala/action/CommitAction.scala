@@ -33,9 +33,11 @@ object CommitAction {
       val commit = new Commit(treeForCommit.get_id(), currentCommitId)
       commit.set_id(commit.generateId())
 
+      println("COMMIT ID : " + commit.get_id())
+
       //Write commit in logs, refs and objects
       LogWriter.updateLogs(commit, currentBranch)
-      updateRef(commit, currentBranch)
+      SgitTools.updateRef(commit.get_id(), currentBranch)
       commit.saveCommitFile()
 
       //Delete content from the stage of the current branch
@@ -130,15 +132,6 @@ object CommitAction {
 
     val parentPath = SgitTools.getParentPath(pathForMax)
     (deepest, rest, parentPath)
-  }
-
-  //Update references in .sgit directory
-  def updateRef(commit: Commit, currentBranch: String): Unit = {
-    if(Files.notExists(Paths.get(s".sgit${File.separator}refs${File.separator}heads${File.separator}${currentBranch}"))) {
-      new File(s".sgit${File.separator}refs${File.separator}heads${File.separator}${currentBranch}").createNewFile()
-    }
-    //Update the HEAD of the branch
-    FileManagement.writeFile(s".sgit${File.separator}refs${File.separator}heads${File.separator}${currentBranch}", commit.id)
   }
 
 }

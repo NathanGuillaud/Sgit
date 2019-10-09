@@ -18,26 +18,13 @@ object Add {
   //Add one element to the stage (file or directory)
   def addElement(path: File, currentBranch: String): Unit = {
     if(path.isDirectory){
-      val listFiles = exploreDirectory(path)
+      val listFiles = FileManagement.exploreDirectory(path)
       listFiles.map(file => addBlob(file, currentBranch))
     } else if(path.isFile) {
       addBlob(path, currentBranch)
     } else {
       println("Not implemented yet")
     }
-  }
-
-  //Get all the files for a directory (recursively)
-  def exploreDirectory(path: File): List[File] = {
-    val allFiles = path.listFiles().toList
-    allFiles.flatMap(elem =>
-        if (elem.isDirectory) {
-          exploreDirectory(elem)
-        }
-        else {
-          List(elem)
-        }
-    )
   }
 
   //Add a blob

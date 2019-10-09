@@ -3,6 +3,8 @@ package util
 import java.io.File
 import java.nio.file.{Files, Paths}
 
+import model.Commit
+
 import scala.io.Source
 
 case class SgitTools()
@@ -33,17 +35,43 @@ object SgitTools {
     } else {
       var parentPath = ""
       var first_dir = true
-      val lastValue = pathSplit.last
-      pathSplit.map(x => if(x != lastValue){
-        if(first_dir){
-          parentPath = x
-          first_dir = false
-        } else {
-          parentPath = parentPath + File.separator + x
-        }
-      })
+      var index = 0
+      pathSplit.map(x =>
+        if(index < pathSplit.length-1){
+          if(first_dir){
+            parentPath = x
+            first_dir = false
+          } else {
+            parentPath = parentPath + File.separator + x
+          }
+          index = index + 1
+      }
+      )
       Some(parentPath)
     }
+  }
+
+  //Update references in .sgit directory
+  def updateRef(commitId: String, currentBranch: String): Unit = {
+    val filePath = s".sgit${File.separator}refs${File.separator}heads${File.separator}${currentBranch}"
+    //Case in test
+    if(commitId == "Nil") {
+      if(Files.exists(Paths.get(filePath))) {
+        new File(filePath).delete()
+      }
+    }
+    //If the commit is not nil
+    else {
+      if(Files.notExists(Paths.get(filePath))) {
+        new File(filePath).createNewFile()
+      }
+      //Update the HEAD of the branch
+      FileManagement.writeFile(filePath, commitId)
+    }
+  }
+
+  def clearStage(currentBranch: String): Unit = {
+    FileManagement.writeFile(s".sgit${File.separator}stages${File.separator}${currentBranch}", "")
   }
 
 }

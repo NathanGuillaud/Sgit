@@ -37,4 +37,17 @@ object FileManagement {
     new String(Files.readAllBytes(Paths.get(file.getAbsolutePath)))
   }
 
+  //Get all the files for a directory (recursively)
+  def exploreDirectory(path: File): List[File] = {
+    val allFiles = path.listFiles().toList
+    allFiles.flatMap(elem =>
+      if (elem.isDirectory) {
+        exploreDirectory(elem)
+      }
+      else {
+        List(elem)
+      }
+    )
+  }
+
 }

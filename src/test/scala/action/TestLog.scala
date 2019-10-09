@@ -8,7 +8,7 @@ import org.scalatest.FunSuite
 import scala.io.Source
 
 class TestLog extends FunSuite {
-  test("sgit log should print all the commits") {
+  /*test("sgit log should print all the commits") {
     Init.init()
     Log.log()
     var nbCommits = 0
@@ -22,5 +22,5 @@ class TestLog extends FunSuite {
     //RETRIEVE NB LINES PRINTED IN CONSOLE
     val nbLinesPrinted = nbLinesForLog
     assert(nbLinesPrinted == nbLinesForLog)
-  }
+  }*/
 }
