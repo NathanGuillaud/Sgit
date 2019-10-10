@@ -17,9 +17,9 @@ object Init {
       listFolders.map(folder => new File(folder).mkdirs())
       listFiles.map(file => new File(file).createNewFile())
       FileManagement.writeFile(s".sgit${File.separator}HEAD", s"ref: refs${File.separator}heads${File.separator}master")
-      println("Sgit repo initialized in " + System.getProperty("user.dir").toString + s"${File.separator}.sgit")
+      println("Sgit repository initialized in " + System.getProperty("user.dir").toString + s"${File.separator}.sgit")
     }else{
-      println("Le sgit a déjà été initialisé pour ce répertoire")
+      println("A sgit repository has already been initialized")
     }
   }
 

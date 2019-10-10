@@ -1,6 +1,7 @@
 package action
 
 import java.io.File
+import java.nio.file.{Files, Paths}
 
 import util.{FileManagement, SgitTools, StageManagement}
 
@@ -8,8 +9,12 @@ object Add {
 
   //Add arguments in the stage
   def add(command: Array[String]): Unit = {
-    val currentBranch = SgitTools.getCurrentBranch()
-    command.map(elem => addElement(new File(elem), currentBranch))
+    if(Files.notExists(Paths.get(".sgit"))) {
+      println("You must be a the root of your project to add")
+    } else {
+      val currentBranch = SgitTools.getCurrentBranch()
+      command.map(elem => addElement(new File(elem), currentBranch))
+    }
   }
 
   //Add one element to the stage (file or directory)
@@ -26,23 +31,26 @@ object Add {
 
   //Add a blob
   def addBlob(path: File, currentBranch: String): Unit = {
-    //Get the name and the content of the file
-    val decomposedFilePath = path.toString().split("/")
-    val fileName = decomposedFilePath(decomposedFilePath.length-1)
-    val fileContent = FileManagement.readFile(path)
+    //Not add file if it is in .sgit directory
+    if(!path.toString.contains(".sgit")) {
+      //Get the name and the content of the file
+      val decomposedFilePath = path.toString().split("/")
+      val fileName = decomposedFilePath(decomposedFilePath.length-1)
+      val fileContent = FileManagement.readFile(path)
 
-    //Hachage du fichier
-    val hashValue = FileManagement.hashFile(fileName, fileContent)
-    val folderHash = hashValue.substring(0,2)
-    val fileHash = hashValue.substring(2)
+      //Hachage du fichier
+      val hashValue = FileManagement.hashFile(fileName, fileContent)
+      val folderHash = hashValue.substring(0,2)
+      val fileHash = hashValue.substring(2)
 
-    //Création du blob dans son répertoire
-    val blobDirectory = s".sgit${File.separator}objects${File.separator}blob${File.separator}${folderHash}"
-    new File(blobDirectory).mkdirs()
-    new File(blobDirectory + s"${File.separator}${fileHash}").createNewFile()
-    FileManagement.writeFile(blobDirectory + s"${File.separator}${fileHash}", fileContent)
+      //Création du blob dans son répertoire
+      val blobDirectory = s".sgit${File.separator}objects${File.separator}blob${File.separator}${folderHash}"
+      new File(blobDirectory).mkdirs()
+      new File(blobDirectory + s"${File.separator}${fileHash}").createNewFile()
+      FileManagement.writeFile(blobDirectory + s"${File.separator}${fileHash}", fileContent)
 
-    StageManagement.addFileInStage(path, hashValue, currentBranch)
+      StageManagement.addFileInStage(path.getPath, hashValue, currentBranch)
+    }
   }
 
 }

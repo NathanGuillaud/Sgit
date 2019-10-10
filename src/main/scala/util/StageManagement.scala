@@ -6,17 +6,21 @@ import java.nio.file.{Files, Paths}
 object StageManagement {
 
   //Add a file to the stage
-  def addFileInStage(path: File, hashId: String, currentBranch: String): Unit = {
+  def addFileInStage(path: String, hashId: String, currentBranch: String): Unit = {
+    var pathToAdd = path
+    if(path.contains("./")) {
+      pathToAdd = path.drop(2)
+    }
     val pathBranchStage = s".sgit${File.separator}stages${File.separator}${currentBranch}"
     if(Files.notExists(Paths.get(pathBranchStage))) {
       new File(pathBranchStage).createNewFile()
     } else {
       //Remove the last version of the file from the stage
-      removeFileFromStage(path.toString, currentBranch)
+      removeFileFromStage(pathToAdd, currentBranch)
     }
     //Add the new version of the file to the stage
     val stageContent = FileManagement.readFile(new File(s".sgit${File.separator}stages${File.separator}" + currentBranch))
-    FileManagement.writeFile(pathBranchStage, stageContent + path.toString + " " + hashId + "\n")
+    FileManagement.writeFile(pathBranchStage, stageContent + pathToAdd + " " + hashId + "\n")
   }
 
   //Remove a file from the stage if the file exists on the stage
