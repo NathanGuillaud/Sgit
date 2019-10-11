@@ -18,6 +18,7 @@ object CommitAction {
       println("Nothing to commit")
     } else {
       val (stage, rootBlobs) = getStageFiles(currentBranch)
+      stage.map(x => println(x))
       val rootTrees = addTrees(stage, None)
 
       //Create the tree for commit
@@ -59,7 +60,7 @@ object CommitAction {
       if(SgitTools.getParentPath(x(0)).isEmpty) {
         rootBlobs = new Element(x(0), x(1), "blob") :: rootBlobs
       } else {
-        paths = SgitTools.getParentPath(x(0)).get :: paths
+        paths = x(0) :: paths
       }
     )
     var hashs = List[String]()
@@ -90,14 +91,23 @@ object CommitAction {
     } else {
       val (deeperList, restList, parentPath) = getDeeperDirectory(l)
       val hash = createTree(deeperList)
-      if(parentPath.isEmpty) {
+      //Case of directory at root
+      /*if(parentPath.isEmpty) {
         if (rootTrees.isEmpty){
           addTrees(restList, Some(List(new Element(deeperList(0).get_path(), hash, "tree"))))
         } else {
           addTrees(restList, Some(new Element(deeperList(0).get_path(), hash, "tree") :: rootTrees.get))
         }
+      }*/
+      //Case of last directory before root
+      if(parentPath.isEmpty) {
+        if (rootTrees.isEmpty){
+          addTrees(restList, Some(List(new Element(SgitTools.getParentPath(deeperList(0).get_path()).get, hash, "tree"))))
+        } else {
+          addTrees(restList, Some(new Element(SgitTools.getParentPath(deeperList(0).get_path()).get, hash, "tree") :: rootTrees.get))
+        }
       } else {
-        addTrees(new Element(parentPath.get, hash, "tree") :: restList, rootTrees)
+        addTrees(new Element(SgitTools.getParentPath(deeperList(0).get_path()).get, hash, "tree") :: restList, rootTrees)
       }
     }
   }
@@ -118,13 +128,15 @@ object CommitAction {
     var max = 0
     var pathForMax = ""
 
-    l.map(line => if (line.get_path().split("/").size >= max) {
-      max = line.get_path().split("/").size
-      pathForMax = line.get_path()
+    l.map(x => println(x.get_path()))
+
+    l.map(line => if (SgitTools.getParentPath(line.get_path()).get.split("/").size >= max) {
+      max = SgitTools.getParentPath(line.get_path()).get.split("/").size
+      pathForMax = SgitTools.getParentPath(line.get_path()).get
     })
 
-    val rest = l.filter(x => !(x.get_path().equals(pathForMax)))
-    val deepest = l.filter(x => x.get_path().equals(pathForMax))
+    val rest = l.filter(x => !(SgitTools.getParentPath(x.get_path()).get.equals(pathForMax)))
+    val deepest = l.filter(x => SgitTools.getParentPath(x.get_path()).get.equals(pathForMax))
 
     val parentPath = SgitTools.getParentPath(pathForMax)
     (deepest, rest, parentPath)

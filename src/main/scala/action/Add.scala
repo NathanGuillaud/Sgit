@@ -5,6 +5,8 @@ import java.nio.file.{Files, Paths}
 
 import util.{FileManagement, SgitTools, StageManagement}
 
+import scala.sys.process.Process
+
 object Add {
 
   //Add arguments in the stage
