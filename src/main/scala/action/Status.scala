@@ -15,28 +15,50 @@ object Status {
 
   //Display files added since the last commit
   def displayAddedFiles(currentBranch: String): Unit = {
-    val stagePath = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
-    if(FileManagement.readFile(new File(stagePath)) != "") {
-      //Retrieve useful data
-      val addedFiles = StageManagement.getAddedFiles(currentBranch)
-      if(!addedFiles.isEmpty) {
-        println("Changes staged for commit:")
-        //Display added files in stage
-        addedFiles.map(file =>
-          println(Console.GREEN + "\t" + file)
-        )
-      }
+    //Retrieve useful data
+    val addedFiles = StageManagement.getAddedFiles(currentBranch)
+    if(!addedFiles.isEmpty) {
+      println("Changes staged for commit:")
+      //Display added files in stage
+      addedFiles.map(file =>
+        println(Console.GREEN + "\t" + file)
+      )
     }
   }
 
   //Display the files updated since the last commit but not added
   def displayUpdatedFiles(currentBranch: String): Unit = {
-
+    //Retrieve files from stage
+    val updatedFiles = getUpdatedFiles(currentBranch)
+    if(!updatedFiles.isEmpty) {
+      println("Changes not staged for commit:")
+      //Display added files in stage
+      updatedFiles.map(file =>
+        println(Console.RED + "\t" + file)
+      )
+    }
   }
 
   //Display files never added
   def displayUntrackedFiles(currentBranch: String): Unit = {
 
+  }
+
+  //Return an array with all updated files in the stage since the last add
+  def getUpdatedFiles(currentBranch: String): Array[String] = {
+    var updatedFiles = Array[String]()
+    val filesInStage = StageManagement.getStageContent(currentBranch)
+    filesInStage.map(line =>
+      if(fileIsUpdated(PathManagement.getParentPath(PathManagement.getSgitPath().get).get + line(0), line(1))) {
+        updatedFiles = updatedFiles :+ line(0)
+      }
+    )
+    updatedFiles
+  }
+
+  //Return true if the file has been updated since the last add (with the hash)
+  def fileIsUpdated(filePath: String, fileHash: String): Boolean = {
+    true
   }
 
  }

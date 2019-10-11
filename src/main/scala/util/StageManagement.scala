@@ -63,10 +63,13 @@ object StageManagement {
 
   //Get the content of the stage file for a given branch
   def getStageContent(currentBranch: String): Array[Array[String]] = {
+    var stageContent = Array[Array[String]]()
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
     val stage = new File(pathBranchStage)
     val files = FileManagement.readFile(stage)
-    val stageContent = files.split("\n").map(x => x.split(" "))
+    if(files != "") {
+      stageContent = files.split("\n").map(x => x.split(" "))
+    }
     stageContent
   }
 
