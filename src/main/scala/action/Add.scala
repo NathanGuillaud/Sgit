@@ -3,7 +3,7 @@ package action
 import java.io.File
 import java.nio.file.{Files, Paths}
 
-import util.{FileManagement, SgitTools, StageManagement}
+import util.{FileManagement, SgitTools, StageManagement, PathManagement}
 
 import scala.sys.process.Process
 
@@ -11,12 +11,8 @@ object Add {
 
   //Add arguments in the stage
   def add(command: Array[String]): Unit = {
-    if(Files.notExists(Paths.get(".sgit"))) {
-      println("You must be a the root of your project to add")
-    } else {
-      val currentBranch = SgitTools.getCurrentBranch()
-      command.map(elem => addElement(new File(elem), currentBranch))
-    }
+    val currentBranch = SgitTools.getCurrentBranch()
+    command.map(elem => addElement(new File(new File(elem).getAbsolutePath), currentBranch))
   }
 
   //Add one element to the stage (file or directory)
@@ -46,12 +42,12 @@ object Add {
       val fileHash = hashValue.substring(2)
 
       //Création du blob dans son répertoire
-      val blobDirectory = s".sgit${File.separator}objects${File.separator}blob${File.separator}${folderHash}"
+      val blobDirectory = s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}blob${File.separator}${folderHash}"
       new File(blobDirectory).mkdirs()
       new File(blobDirectory + s"${File.separator}${fileHash}").createNewFile()
       FileManagement.writeFile(blobDirectory + s"${File.separator}${fileHash}", fileContent)
 
-      StageManagement.addFileInStage(path.getPath, hashValue, currentBranch)
+      StageManagement.addFileInStage(PathManagement.getFilePathFromProjectRoot(path.getPath).get, hashValue, currentBranch)
     }
   }
 

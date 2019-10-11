@@ -3,7 +3,7 @@ package action
 import java.io.File
 
 import org.scalatest.FunSuite
-import util.{FileManagement, SgitTools}
+import util.{FileManagement, PathManagement, SgitTools}
 
 import scala.reflect.io.Directory
 
@@ -12,11 +12,11 @@ class TestAdd extends FunSuite {
     Init.init()
     val currentBranch = SgitTools.getCurrentBranch()
     createTmpDirectory()
-    val nbOfBlobDirs = FileManagement.getFilesFromDirectory(new File(s".sgit${File.separator}objects${File.separator}blob")).length
+    val nbOfBlobDirs = FileManagement.getFilesFromDirectory(new File(s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}blob")).length
 
     Add.add(Array("testAdd", "rootTestAdd.txt"))
 
-    assert(FileManagement.getFilesFromDirectory(new File(s".sgit${File.separator}objects${File.separator}blob")).length == nbOfBlobDirs + 3)
+    assert(FileManagement.getFilesFromDirectory(new File(s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}blob")).length == nbOfBlobDirs + 3)
 
     removeTmpDirectories()
     SgitTools.clearStage(currentBranch)
@@ -26,11 +26,11 @@ class TestAdd extends FunSuite {
     Init.init()
     createTmpDirectory()
     val currentBranch = SgitTools.getCurrentBranch()
-    val nbLinesInStage = FileManagement.readFile(new File(s".sgit${File.separator}stages${File.separator}${currentBranch}")).split(File.separator).length
+    val nbLinesInStage = FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}")).split(File.separator).length
 
     Add.add(Array("testAdd", "rootTestAdd.txt"))
 
-    assert(FileManagement.readFile(new File(s".sgit${File.separator}stages${File.separator}${currentBranch}")).split(File.separator).length == nbLinesInStage + 3)
+    assert(FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}")).split(File.separator).length == nbLinesInStage + 3)
 
     removeTmpDirectories()
     SgitTools.clearStage(currentBranch)
@@ -41,11 +41,11 @@ class TestAdd extends FunSuite {
     createTmpDirectory()
     val currentBranch = SgitTools.getCurrentBranch()
     Add.add(Array("testAdd", "rootTestAdd.txt"))
-    val nbLinesInStage = FileManagement.readFile(new File(s".sgit${File.separator}stages${File.separator}${currentBranch}")).split(File.separator).length
+    val nbLinesInStage = FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}")).split(File.separator).length
 
     Add.add(Array("testAdd", "rootTestAdd.txt"))
 
-    assert(FileManagement.readFile(new File(s".sgit${File.separator}stages${File.separator}${currentBranch}")).split(File.separator).length == nbLinesInStage)
+    assert(FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}")).split(File.separator).length == nbLinesInStage)
 
     removeTmpDirectories()
     SgitTools.clearStage(currentBranch)
@@ -59,24 +59,25 @@ class TestAdd extends FunSuite {
   }
 
   def removeTmpDirectories(): Unit = {
+    val pathSgit = PathManagement.getSgitPath().get
     //Remove directories and files added for test
     new Directory(new File("testAdd")).deleteRecursively()
     new File("rootTestAdd.txt").delete()
 
     //Remove files in .sgit
-    new File(".sgit/objects/blob/5f/b4a5dafc86609af8d51f26f4d3cbddeb809ff372e0d18a1f511a5340799a4d").delete()
-    new File(".sgit/objects/blob/e5/a536016f35d3a95c4237092ad38ad69e9595d6501603d6076e523bcd38f089").delete()
-    new File(".sgit/objects/blob/fd/11e87548101d72352a3d8f57ce65ebf482aa8bc5afaee0dcbfdd99e3425ae9").delete()
+    new File(s"${pathSgit}/objects/blob/5f/b4a5dafc86609af8d51f26f4d3cbddeb809ff372e0d18a1f511a5340799a4d").delete()
+    new File(s"${pathSgit}/objects/blob/e5/a536016f35d3a95c4237092ad38ad69e9595d6501603d6076e523bcd38f089").delete()
+    new File(s"${pathSgit}/objects/blob/fd/11e87548101d72352a3d8f57ce65ebf482aa8bc5afaee0dcbfdd99e3425ae9").delete()
 
     //Remove directories in .sgit if they are empty
-    if(FileManagement.getListOfFilesAndDirectories(".sgit/objects/blob/5f").isEmpty) {
-      new Directory(new File(".sgit/objects/blob/5f")).deleteRecursively()
+    if(FileManagement.getListOfFilesAndDirectories(s"${pathSgit}/objects/blob/5f").isEmpty) {
+      new Directory(new File(s"${pathSgit}/objects/blob/5f")).deleteRecursively()
     }
     if(FileManagement.getListOfFilesAndDirectories(".sgit/objects/blob/e5").isEmpty) {
-      new Directory(new File(".sgit/objects/blob/e5")).deleteRecursively()
+      new Directory(new File(s"${pathSgit}/objects/blob/e5")).deleteRecursively()
     }
-    if(FileManagement.getListOfFilesAndDirectories(".sgit/objects/blob/fd").isEmpty) {
-      new Directory(new File(".sgit/objects/blob/fd")).deleteRecursively()
+    if(FileManagement.getListOfFilesAndDirectories(s"${pathSgit}/objects/blob/fd").isEmpty) {
+      new Directory(new File(s"${pathSgit}/objects/blob/fd")).deleteRecursively()
     }
   }
 

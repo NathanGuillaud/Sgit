@@ -2,7 +2,7 @@ package action
 
 import java.io.File
 
-import util.{FileManagement, SgitTools}
+import util.{FileManagement, PathManagement, SgitTools}
 
 object Status {
    def status(): Unit = {
@@ -15,7 +15,7 @@ object Status {
 
   //Display files added since the last commit
   def displayAddedFiles(currentBranch: String): Unit = {
-    val stagePath = s".sgit${File.separator}stages${File.separator}${currentBranch}"
+    val stagePath = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
     if(FileManagement.readFile(new File(stagePath)) != "") {
       //Retrieve useful data
       val stage = new File(stagePath)

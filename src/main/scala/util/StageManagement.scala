@@ -7,11 +7,8 @@ object StageManagement {
 
   //Add a file to the stage
   def addFileInStage(path: String, hashId: String, currentBranch: String): Unit = {
-    var pathToAdd = path
-    if(path.contains("./")) {
-      pathToAdd = path.drop(2)
-    }
-    val pathBranchStage = s".sgit${File.separator}stages${File.separator}${currentBranch}"
+    var pathToAdd = path.replaceAllLiterally("./", "")
+    val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
     if(Files.notExists(Paths.get(pathBranchStage))) {
       new File(pathBranchStage).createNewFile()
     } else {
@@ -19,13 +16,13 @@ object StageManagement {
       removeFileFromStage(pathToAdd, currentBranch)
     }
     //Add the new version of the file to the stage
-    val stageContent = FileManagement.readFile(new File(s".sgit${File.separator}stages${File.separator}" + currentBranch))
+    val stageContent = FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}" + currentBranch))
     FileManagement.writeFile(pathBranchStage, stageContent + pathToAdd + " " + hashId + "\n")
   }
 
   //Remove a file from the stage if the file exists on the stage
   def removeFileFromStage(filePath: String, currentBranch: String): Unit = {
-    val pathBranchStage = s".sgit${File.separator}stages${File.separator}${currentBranch}"
+    val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
     val stage = new File(pathBranchStage)
     val files = FileManagement.readFile(stage)
     val stageContent = files.split("\n").map(x => x.split(" "))

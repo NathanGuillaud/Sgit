@@ -2,7 +2,7 @@ package model
 
 import java.io.File
 
-import util.FileManagement
+import util.{FileManagement, PathManagement}
 
 case class Tree(
                var id: String = "",
@@ -54,7 +54,7 @@ case class Tree(
     val treeFileHash = treeHashValue.substring(2)
 
     //Add the tree file
-    val pathTreeDirectory = s".sgit${File.separator}objects${File.separator}tree${File.separator}${treeFolderHash}"
+    val pathTreeDirectory = s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}tree${File.separator}${treeFolderHash}"
     new File(pathTreeDirectory).mkdirs()
     new File(pathTreeDirectory + s"${File.separator}${treeFileHash}").createNewFile()
     FileManagement.writeFile(pathTreeDirectory + s"${File.separator}${treeFileHash}", this.toString())

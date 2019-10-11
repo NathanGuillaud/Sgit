@@ -3,7 +3,7 @@ package action
 import java.io.File
 import java.nio.file.{Files, Paths}
 
-import util.{FileManagement, SgitTools}
+import util.{FileManagement, PathManagement, SgitTools}
 
 import scala.io.Source
 
@@ -13,8 +13,8 @@ object Branch {
   def branch(command: Array[String]): Unit = {
     //Retrieve current branch
     val currentBranch = SgitTools.getCurrentBranch()
-    val pathRefsHeads = s".sgit${File.separator}refs${File.separator}heads${File.separator}"
-    val pathLogsNewBranch = s".sgit${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${command(0)}"
+    val pathRefsHeads = s"${PathManagement.getSgitPath().get}${File.separator}refs${File.separator}heads${File.separator}"
+    val pathLogsNewBranch = s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${command(0)}"
     if(Files.notExists(Paths.get(pathRefsHeads + s"${currentBranch}"))) {
       println("You have to make a first commit before create a new branch")
     }
@@ -25,7 +25,7 @@ object Branch {
       //Retrieve current commit
       val currentCommit = Source.fromFile(pathRefsHeads + s"${currentBranch}").getLines.mkString("\n")
       //Create new file for stage
-      new File(s".sgit${File.separator}stages${File.separator}${command(0)}").createNewFile()
+      new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${command(0)}").createNewFile()
       //Write head into refs
       new File(pathRefsHeads + s"${command(0)}").createNewFile()
       FileManagement.writeFile(pathRefsHeads + s"${command(0)}", currentCommit)
@@ -38,7 +38,7 @@ object Branch {
 
   //List all the branches and give the current branch
   def branchAV(): Unit = {
-    val pathRefsHeads = s".sgit${File.separator}refs${File.separator}heads"
+    val pathRefsHeads = s"${PathManagement.getSgitPath().get}${File.separator}refs${File.separator}heads"
     if(Files.exists(Paths.get(pathRefsHeads))) {
       val currentBranch = SgitTools.getCurrentBranch()
       val branches = FileManagement.getListOfFilesAndDirectories(pathRefsHeads + s"${File.separator}")

@@ -3,7 +3,7 @@ package model
 import java.io.File
 import java.util.Date
 
-import util.FileManagement
+import util.{FileManagement, PathManagement}
 
 case class Commit(
                  var id: String = "",
@@ -56,7 +56,7 @@ case class Commit(
     val commitFileHash = commitHashValue.substring(2)
 
     //Add the tree file
-    val pathCommitDirectory = s".sgit${File.separator}objects${File.separator}commit${File.separator}${commitFolderHash}"
+    val pathCommitDirectory = s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}commit${File.separator}${commitFolderHash}"
     new File(pathCommitDirectory).mkdirs()
     new File(pathCommitDirectory + s"${File.separator}${commitFileHash}").createNewFile()
     FileManagement.writeFile(pathCommitDirectory + s"${File.separator}${commitFileHash}", this.toString())

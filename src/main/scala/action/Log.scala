@@ -3,12 +3,14 @@ package action
 import java.io.File
 import java.nio.file.{Files, Paths}
 
+import util.PathManagement
+
 import scala.io.Source
 
 object Log {
 
   def log(): Unit = {
-    val pathLogsHead = s".sgit${File.separator}logs${File.separator}HEAD"
+    val pathLogsHead = s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}HEAD"
     if(Files.exists(Paths.get(pathLogsHead)) && (Source.fromFile(pathLogsHead).getLines.length != 0)) {
       val commitsArray = Source.fromFile(pathLogsHead).getLines.toArray
       commitsArray.map(commitLine => printCommit(commitLine))

@@ -3,14 +3,14 @@ package action
 import java.io.File
 import java.nio.file.{Files, Paths}
 
-import util.{FileManagement, SgitTools}
+import util.{FileManagement, PathManagement, SgitTools}
 
 import scala.io.Source
 
 object Tag {
   def tag(command: Array[String]): Unit = {
     val currentBranch = SgitTools.getCurrentBranch()
-    val pathTags = s".sgit${File.separator}refs${File.separator}tags"
+    val pathTags = s"${PathManagement.getSgitPath().get}${File.separator}refs${File.separator}tags"
     if(Files.notExists(Paths.get(pathTags))) {
       println("You have to make a first commit before create a new tag")
     }
