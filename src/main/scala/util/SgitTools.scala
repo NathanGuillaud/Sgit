@@ -42,8 +42,4 @@ object SgitTools {
     }
   }
 
-  def clearStage(currentBranch: String): Unit = {
-    FileManagement.writeFile(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}", "")
-  }
-
 }

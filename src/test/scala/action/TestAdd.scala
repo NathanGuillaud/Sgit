@@ -3,7 +3,7 @@ package action
 import java.io.File
 
 import org.scalatest.FunSuite
-import util.{FileManagement, PathManagement, SgitTools}
+import util.{FileManagement, PathManagement, SgitTools, StageManagement}
 
 import scala.reflect.io.Directory
 
@@ -19,7 +19,7 @@ class TestAdd extends FunSuite {
     assert(FileManagement.getFilesFromDirectory(new File(s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}blob")).length == nbOfBlobDirs + 3)
 
     removeTmpDirectories()
-    SgitTools.clearStage(currentBranch)
+    StageManagement.clearStage(currentBranch)
   }
 
   test("sgit add fill the stage file of the current branch") {
@@ -33,7 +33,7 @@ class TestAdd extends FunSuite {
     assert(FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}")).split(File.separator).length == nbLinesInStage + 3)
 
     removeTmpDirectories()
-    SgitTools.clearStage(currentBranch)
+    StageManagement.clearStage(currentBranch)
   }
 
   test("sgit add replace a file if it is already in the stage") {
@@ -48,7 +48,7 @@ class TestAdd extends FunSuite {
     assert(FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}")).split(File.separator).length == nbLinesInStage)
 
     removeTmpDirectories()
-    SgitTools.clearStage(currentBranch)
+    StageManagement.clearStage(currentBranch)
   }
 
   def createTmpDirectory(): Unit = {

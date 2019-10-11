@@ -3,7 +3,7 @@ package action
 import java.io.File
 
 import model.{Commit, Tree, Element}
-import util.{FileManagement, SgitTools, LogWriter, PathManagement}
+import util.{FileManagement, SgitTools, LogWriter, PathManagement, StageManagement}
 
 object CommitAction {
 
@@ -12,7 +12,7 @@ object CommitAction {
     val currentBranch = SgitTools.getCurrentBranch()
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
     //If the stage is empty, nothing to commit
-    if(FileManagement.readFile(new File(pathBranchStage)) == "") {
+    if(!StageManagement.containsNewFiles(currentBranch)) {
       println("Nothing to commit")
     } else {
       val (stage, rootBlobs) = getStageFiles(currentBranch)
@@ -34,8 +34,8 @@ object CommitAction {
       SgitTools.updateRef(commit.get_id(), currentBranch)
       commit.saveCommitFile()
 
-      //Delete content from the stage of the current branch
-      FileManagement.writeFile(pathBranchStage, "")
+      //Update content from the stage of the current branch to commited
+      StageManagement.archiveFilesFromStage(currentBranch)
 
       println("[" + currentBranch + " " + commit.id + "]")
     }

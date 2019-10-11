@@ -7,7 +7,7 @@ object StageManagement {
 
   //Add a file to the stage
   def addFileInStage(path: String, hashId: String, currentBranch: String): Unit = {
-    var pathToAdd = path.replaceAllLiterally("./", "")
+    val pathToAdd = path.replaceAllLiterally("./", "")
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
     if(Files.notExists(Paths.get(pathBranchStage))) {
       new File(pathBranchStage).createNewFile()
@@ -16,26 +16,62 @@ object StageManagement {
       removeFileFromStage(pathToAdd, currentBranch)
     }
     //Add the new version of the file to the stage
-    val stageContent = FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}" + currentBranch))
-    FileManagement.writeFile(pathBranchStage, stageContent + pathToAdd + " " + hashId + "\n")
+    val stageContent = FileManagement.readFile(new File(pathBranchStage))
+    FileManagement.writeFile(pathBranchStage, stageContent + pathToAdd + " " + hashId + " added\n")
   }
 
   //Remove a file from the stage if the file exists on the stage
   def removeFileFromStage(filePath: String, currentBranch: String): Unit = {
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
-    val stage = new File(pathBranchStage)
-    val files = FileManagement.readFile(stage)
-    val stageContent = files.split("\n").map(x => x.split(" "))
+    val files = FileManagement.readFile(new File(pathBranchStage))
+    val stageContent = getStageContent(currentBranch)
     if(stageContent.length > 0 && files != "") {
       var newContent = ""
       stageContent.map(line =>
         if(line(0) != filePath) {
-          newContent = newContent + line(0) + " " + line(1) + "\n"
+          newContent = newContent + line(0) + " " + line(1) + " " + line(2) + "\n"
         }
       )
       //Write new content in stage
       FileManagement.writeFile(pathBranchStage, newContent)
     }
+  }
+
+  //Archive a file from the stage after a commit (remove the *)
+  def archiveFilesFromStage(currentBranch: String): Unit = {
+    val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
+    val stageContent = getStageContent(currentBranch)
+    var newContent = ""
+    stageContent.map(line =>
+      newContent = newContent + line(0) + " " + line(1) + " commited" + "\n"
+    )
+    //Write new content in stage
+    FileManagement.writeFile(pathBranchStage, newContent)
+  }
+
+  //Return true if the stage contains at least 1 new file since the last commit, else return false
+  def containsNewFiles(currentBranch: String): Boolean = {
+    var containsNewFile = false
+    val stageContent = getStageContent(currentBranch)
+    stageContent.map(line =>
+      if(line(2) == "added") {
+        containsNewFile = true
+      }
+    )
+    containsNewFile
+  }
+
+  //Get the content of the stage file for a given branch
+  def getStageContent(currentBranch: String): Array[Array[String]] = {
+    val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
+    val stage = new File(pathBranchStage)
+    val files = FileManagement.readFile(stage)
+    val stageContent = files.split("\n").map(x => x.split(" "))
+    stageContent
+  }
+
+  def clearStage(currentBranch: String): Unit = {
+    FileManagement.writeFile(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}", "")
   }
 
 }

@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths}
 
 import model.Commit
 import org.scalatest.FunSuite
-import util.{FileManagement, PathManagement, SgitTools}
+import util.{FileManagement, PathManagement, SgitTools, StageManagement}
 
 import scala.io.Source
 import scala.reflect.io.Directory
@@ -17,7 +17,6 @@ class TestCommit extends FunSuite {
     val currentBranch = SgitTools.getCurrentBranch()
     val currentCommit = SgitTools.getCurrentCommit(currentBranch)
     val nbOfTree = FileManagement.getFilesFromDirectory(new File(s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}tree")).length
-    SgitTools.clearStage(currentBranch)
     Add.add(Array("testCommit", "rootTestCommit.txt"))
 
     CommitAction.commit()
@@ -27,6 +26,7 @@ class TestCommit extends FunSuite {
     removeTmpDirectories()
     removeTmpLogs(currentBranch)
     SgitTools.updateRef(currentCommit, currentBranch)
+    StageManagement.clearStage(currentBranch)
   }
 
   test("sgit commit add 1 commit in .sgit directory") {
@@ -35,7 +35,6 @@ class TestCommit extends FunSuite {
     val currentBranch = SgitTools.getCurrentBranch()
     val currentCommit = SgitTools.getCurrentCommit(currentBranch)
     val nbOfCommit = FileManagement.getFilesFromDirectory(new File(s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}commit")).length
-    SgitTools.clearStage(currentBranch)
     Add.add(Array("rootTestCommit.txt"))
 
     CommitAction.commit()
@@ -45,6 +44,7 @@ class TestCommit extends FunSuite {
     removeTmpDirectories()
     removeTmpLogs(currentBranch)
     SgitTools.updateRef(currentCommit, currentBranch)
+    StageManagement.clearStage(currentBranch)
   }
 
   test("sgit commit add 1 line in logs/HEAD") {
@@ -56,7 +56,6 @@ class TestCommit extends FunSuite {
     if(Files.exists(Paths.get(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}HEAD"))) {
       nbOfCommits = Source.fromFile(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}HEAD").getLines.length
     }
-    SgitTools.clearStage(currentBranch)
     Add.add(Array("testCommit", "rootTestCommit.txt"))
 
     CommitAction.commit()
@@ -66,6 +65,7 @@ class TestCommit extends FunSuite {
     removeTmpDirectories()
     removeTmpLogs(currentBranch)
     SgitTools.updateRef(currentCommit, currentBranch)
+    StageManagement.clearStage(currentBranch)
   }
 
   test("sgit commit add 1 line in logs/refs/heads/master") {
@@ -77,7 +77,6 @@ class TestCommit extends FunSuite {
     if(Files.exists(Paths.get(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${currentBranch}"))) {
         nbOfCommitMaster = Source.fromFile(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${currentBranch}").getLines.length
     }
-    SgitTools.clearStage(currentBranch)
     Add.add(Array("testCommit", "rootTestCommit.txt"))
 
     CommitAction.commit()
@@ -87,6 +86,7 @@ class TestCommit extends FunSuite {
     removeTmpDirectories()
     removeTmpLogs(currentBranch)
     SgitTools.updateRef(currentCommit, currentBranch)
+    StageManagement.clearStage(currentBranch)
   }
 
   test("sgit commit add 1 line in refs/heads/master") {
@@ -94,8 +94,6 @@ class TestCommit extends FunSuite {
     createTmpDirectories()
     val currentBranch = SgitTools.getCurrentBranch()
     val currentCommit = SgitTools.getCurrentCommit(currentBranch)
-    var nbOfCommitMaster = 0
-    SgitTools.clearStage(currentBranch)
     Add.add(Array("testCommit", "rootTestCommit.txt"))
 
     CommitAction.commit()
@@ -106,6 +104,36 @@ class TestCommit extends FunSuite {
     removeTmpDirectories()
     removeTmpLogs(currentBranch)
     SgitTools.updateRef(currentCommit, currentBranch)
+    StageManagement.clearStage(currentBranch)
+  }
+
+  test("before sgit commit files are added in stage") {
+    Init.init()
+    createTmpDirectories()
+    val currentBranch = SgitTools.getCurrentBranch()
+    Add.add(Array("testCommit", "rootTestCommit.txt"))
+
+    assert(StageManagement.containsNewFiles(currentBranch))
+
+    removeTmpDirectories()
+    StageManagement.clearStage(currentBranch)
+  }
+
+  test("sgit commit archived all files in stage") {
+    Init.init()
+    createTmpDirectories()
+    val currentBranch = SgitTools.getCurrentBranch()
+    val currentCommit = SgitTools.getCurrentCommit(currentBranch)
+    Add.add(Array("testCommit", "rootTestCommit.txt"))
+
+    CommitAction.commit()
+
+    assert(!StageManagement.containsNewFiles(currentBranch))
+
+    removeTmpDirectories()
+    removeTmpLogs(currentBranch)
+    SgitTools.updateRef(currentCommit, currentBranch)
+    StageManagement.clearStage(currentBranch)
   }
 
   def createTmpDirectories(): Unit = {
