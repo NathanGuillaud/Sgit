@@ -2,7 +2,7 @@ package action
 
 import java.io.File
 
-import util.{FileManagement, PathManagement, SgitTools}
+import util.{FileManagement, PathManagement, SgitTools, StageManagement}
 
 object Status {
    def status(): Unit = {
@@ -18,14 +18,14 @@ object Status {
     val stagePath = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
     if(FileManagement.readFile(new File(stagePath)) != "") {
       //Retrieve useful data
-      val stage = new File(stagePath)
-      val files = FileManagement.readFile(stage)
-      val stage_content = files.split("\n").map(x => x.split(" "))
-
-      //Display each file in stage
-      stage_content.map(path =>
-        println(Console.GREEN + "\t" + path(0))
-      )
+      val addedFiles = StageManagement.getAddedFiles(currentBranch)
+      if(!addedFiles.isEmpty) {
+        println("Changes staged for commit:")
+        //Display added files in stage
+        addedFiles.map(file =>
+          println(Console.GREEN + "\t" + file)
+        )
+      }
     }
   }
 

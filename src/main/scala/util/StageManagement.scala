@@ -74,4 +74,15 @@ object StageManagement {
     FileManagement.writeFile(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}", "")
   }
 
+  def getAddedFiles(currentBranch: String): Array[String] = {
+    var addedFiles = Array[String]()
+    val stageContent = getStageContent(currentBranch)
+    stageContent.map(line =>
+      if(line(2) == "added") {
+        addedFiles = addedFiles :+ line(0)
+      }
+    )
+    addedFiles
+  }
+
 }
