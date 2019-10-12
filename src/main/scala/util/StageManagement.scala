@@ -5,19 +5,19 @@ import java.nio.file.{Files, Paths}
 
 object StageManagement {
 
-  //Add a file to the stage
+  //Add a file to the stage if the file has been modified since the last adding
   def addFileInStage(path: String, hashId: String, currentBranch: String): Unit = {
     val pathToAdd = path.replaceAllLiterally("./", "")
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
     if(Files.notExists(Paths.get(pathBranchStage))) {
-      new File(pathBranchStage).createNewFile()
-    } else {
+      FileManagement.writeFile(pathBranchStage, pathToAdd + " " + hashId + " added\n")
+    } else if (fileHasChange(path, hashId, currentBranch)) {
       //Remove the last version of the file from the stage
       removeFileFromStage(pathToAdd, currentBranch)
+      //Add the new version of the file to the stage
+      val stageContent = FileManagement.readFile(new File(pathBranchStage))
+      FileManagement.writeFile(pathBranchStage, stageContent + pathToAdd + " " + hashId + " added\n")
     }
-    //Add the new version of the file to the stage
-    val stageContent = FileManagement.readFile(new File(pathBranchStage))
-    FileManagement.writeFile(pathBranchStage, stageContent + pathToAdd + " " + hashId + " added\n")
   }
 
   //Remove a file from the stage if the file exists on the stage
@@ -73,10 +73,12 @@ object StageManagement {
     stageContent
   }
 
+  //Delete all the content of the stage
   def clearStage(currentBranch: String): Unit = {
     FileManagement.writeFile(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}", "")
   }
 
+  //Get all files added since the last commit in the stage
   def getAddedFiles(currentBranch: String): Array[String] = {
     var addedFiles = Array[String]()
     val stageContent = getStageContent(currentBranch)
@@ -86,6 +88,21 @@ object StageManagement {
       }
     )
     addedFiles
+  }
+
+  //Return true if the file give in parameter has changed since the last adding, else return false
+  def fileHasChange(path: String, hashId: String, currentBranch: String): Boolean = {
+    var hasChange = true
+    getStageContent(currentBranch).map(file =>
+      //Case of the searched file
+      if(file(0) == path) {
+        //If the file has not the same hash value, it's a change on the file
+        if(file(1) == hashId) {
+          hasChange = false
+        }
+      }
+    )
+    hasChange
   }
 
 }

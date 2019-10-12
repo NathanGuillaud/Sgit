@@ -26,11 +26,10 @@ class TestAdd extends FunSuite {
     Init.init()
     createTmpDirectory()
     val currentBranch = SgitTools.getCurrentBranch()
-    val nbLinesInStage = FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}")).split(File.separator).length
 
     Add.add(Array("testAdd", "rootTestAdd.txt"))
 
-    assert(FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}")).split(File.separator).length == nbLinesInStage + 3)
+    assert(FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}")).split("\n").length == 3)
 
     removeTmpDirectories()
     StageManagement.clearStage(currentBranch)

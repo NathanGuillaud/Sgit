@@ -1,11 +1,8 @@
 package action
 
 import java.io.File
-import java.nio.file.{Files, Paths}
 
 import util.{FileManagement, SgitTools, StageManagement, PathManagement}
-
-import scala.sys.process.Process
 
 object Add {
 

@@ -12,7 +12,7 @@ object Status {
      //Display the current branch
      val currentBranch = SgitTools.getCurrentBranch()
      println("On the branch " + currentBranch)
-     
+
      if (StageManagement.getAddedFiles(currentBranch).isEmpty && getUpdatedFiles(currentBranch).isEmpty && getUntrackedFiles(currentBranch).isEmpty){
        println("Nothing to commit, working directory clean")
      } else {

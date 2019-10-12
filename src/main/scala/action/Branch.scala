@@ -19,19 +19,21 @@ object Branch {
       println("You have to make a first commit before create a new branch")
     }
     //If the branch already exists
-    else if(Files.exists(Paths.get(pathRefsHeads + s"${command(0)}"))){
+    else if(Files.exists(Paths.get(s"${pathRefsHeads}${command(0)}"))){
       println("The branch " + command(0) + " already exists")
     } else {
       //Retrieve current commit
-      val currentCommit = Source.fromFile(pathRefsHeads + s"${currentBranch}").getLines.mkString("\n")
+      val currentCommit = FileManagement.readFile(new File(s"${pathRefsHeads}${currentBranch}"))
+
       //Create new file for stage
-      new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${command(0)}").createNewFile()
+      val currentStageContent = FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"))
+      FileManagement.writeFile(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${command(0)}", currentStageContent)
+
       //Write head into refs
-      new File(pathRefsHeads + s"${command(0)}").createNewFile()
-      FileManagement.writeFile(pathRefsHeads + s"${command(0)}", currentCommit)
+      FileManagement.writeFile(s"${pathRefsHeads}${command(0)}", currentCommit)
+
       //Write in logs
-      val lastCommitForCurrentBranch = Source.fromFile(pathRefsHeads + s"${currentBranch}").getLines.toArray.last
-      new File(pathLogsNewBranch).createNewFile()
+      val lastCommitForCurrentBranch = FileManagement.readFile(new File(s"${pathRefsHeads}${currentBranch}")).split("\n").last
       FileManagement.writeFile(pathLogsNewBranch, lastCommitForCurrentBranch + "::branch: Created from " + currentBranch)
     }
   }
