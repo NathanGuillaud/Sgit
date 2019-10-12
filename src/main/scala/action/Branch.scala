@@ -49,7 +49,7 @@ object Branch {
   //Print a branch
   def printBranch(branchName: String, lastCommit: String, currentBranch: String): Unit = {
     if(branchName == currentBranch) {
-      println(Console.GREEN + "* " + branchName + "\t" + lastCommit)
+      println(Console.GREEN + "* " + branchName + "\t" + lastCommit + Console.WHITE)
     } else {
       println("  " + branchName + "\t" + lastCommit)
     }

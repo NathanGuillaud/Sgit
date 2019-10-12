@@ -21,8 +21,8 @@ object Log {
 
   def printCommit(commitLine: String): Unit = {
     val commitValues = commitLine.split("::")
-    println(Console.YELLOW + "commit:" + "\t" + commitValues(0))
-    println(Console.WHITE + "author:" + "\t" + commitValues(1) + "\n" + "date:" + "\t" + commitValues(2) + "\n")
+    println(Console.YELLOW + "commit:" + "\t" + commitValues(0) + Console.WHITE)
+    println("author:" + "\t" + commitValues(1) + "\n" + "date:" + "\t" + commitValues(2) + "\n")
   }
 
   def logP(): Unit = {

@@ -43,6 +43,12 @@ object PathManagement {
     }
   }
 
+  def getProjectPath(): Option[String] = {
+    if(PathManagement.getSgitPath().isEmpty) None
+    else if(PathManagement.getParentPath(PathManagement.getSgitPath().get).isEmpty) None
+    else Some(PathManagement.getParentPath(PathManagement.getSgitPath().get).get)
+  }
+
   def getFilePathFromProjectRoot(filePath: String): Option[String] = {
     var projectPath = ""
     if(!getParentPath(getSgitPath().get).isEmpty) {
