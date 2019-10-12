@@ -9,35 +9,39 @@ object CommitAction {
 
   //Commit all the files add previously (on the stage)
   def commit(): Unit = {
-    val currentBranch = SgitTools.getCurrentBranch()
-    val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
-    //If the stage is empty, nothing to commit
-    if(!StageManagement.containsNewFiles(currentBranch)) {
-      println("Nothing to commit")
+    if(PathManagement.getSgitPath().isEmpty){
+      println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
     } else {
-      val (stage, rootBlobs) = getStageFiles(currentBranch)
-      val rootTrees = addTrees(stage, None)
+      val currentBranch = SgitTools.getCurrentBranch()
+      val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
+      //If the stage is empty, nothing to commit
+      if(!StageManagement.containsNewFiles(currentBranch)) {
+        println("Nothing to commit")
+      } else {
+        val (stage, rootBlobs) = getStageFiles(currentBranch)
+        val rootTrees = addTrees(stage, None)
 
-      //Create the tree for commit
-      val treeForCommit = new Tree()
-      treeForCommit.fillWithBlobsAndTrees(rootBlobs, rootTrees)
-      treeForCommit.set_id(treeForCommit.generateId())
-      treeForCommit.saveTreeFile()
+        //Create the tree for commit
+        val treeForCommit = new Tree()
+        treeForCommit.fillWithBlobsAndTrees(rootBlobs, rootTrees)
+        treeForCommit.set_id(treeForCommit.generateId())
+        treeForCommit.saveTreeFile()
 
-      //Create the new commit
-      val currentCommitId = SgitTools.getCurrentCommit(currentBranch)
-      val commit = new Commit(treeForCommit.get_id(), currentCommitId)
-      commit.set_id(commit.generateId())
+        //Create the new commit
+        val currentCommitId = SgitTools.getCurrentCommit(currentBranch)
+        val commit = new Commit(treeForCommit.get_id(), currentCommitId)
+        commit.set_id(commit.generateId())
 
-      //Write commit in logs, refs and objects
-      LogWriter.updateLogs(commit, currentBranch)
-      SgitTools.updateRef(commit.get_id(), currentBranch)
-      commit.saveCommitFile()
+        //Write commit in logs, refs and objects
+        LogWriter.updateLogs(commit, currentBranch)
+        SgitTools.updateRef(commit.get_id(), currentBranch)
+        commit.saveCommitFile()
 
-      //Update content from the stage of the current branch to commited
-      StageManagement.archiveFilesFromStage(currentBranch)
+        //Update content from the stage of the current branch to commited
+        StageManagement.archiveFilesFromStage(currentBranch)
 
-      println("[" + currentBranch + " " + commit.id + "]")
+        println("[" + currentBranch + " " + commit.id + "]")
+      }
     }
   }
 

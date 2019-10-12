@@ -43,7 +43,7 @@ case class Commit(
   }
 
   override def toString(): String = {
-    "date " + this.get_date() + "\n" + "author " + this.get_author() + "\n" + "tree " + this.get_tree_id() + "\n" + "parent " + this.get_parent_commit()
+    "date::" + this.get_date() + "\n" + "author::" + this.get_author() + "\n" + "tree::" + this.get_tree_id() + "\n" + "parent::" + this.get_parent_commit()
   }
 
   def toStringForLogs(): String = {

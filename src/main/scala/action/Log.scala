@@ -3,19 +3,23 @@ package action
 import java.io.File
 import java.nio.file.{Files, Paths}
 
-import util.PathManagement
+import util.{FileManagement, PathManagement}
 
 import scala.io.Source
 
 object Log {
 
   def log(): Unit = {
-    val pathLogsHead = s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}HEAD"
-    if(Files.exists(Paths.get(pathLogsHead)) && (Source.fromFile(pathLogsHead).getLines.length != 0)) {
-      val commitsArray = Source.fromFile(pathLogsHead).getLines.toArray
-      commitsArray.map(commitLine => printCommit(commitLine))
+    if(PathManagement.getSgitPath().isEmpty){
+      println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
     } else {
-      println("No commit for the moment")
+      val pathLogsHead = s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}HEAD"
+      if(Files.exists(Paths.get(pathLogsHead)) && (Source.fromFile(pathLogsHead).getLines.length != 0)) {
+        val commitsArray = FileManagement.readFile(new File(pathLogsHead)).split("\n").toList.reverse
+        commitsArray.map(commitLine => printCommit(commitLine))
+      } else {
+        println("No commit for the moment")
+      }
     }
   }
 

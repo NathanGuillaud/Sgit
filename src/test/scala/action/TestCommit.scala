@@ -149,16 +149,24 @@ class TestCommit extends FunSuite {
     new File("rootTestCommit.txt").delete()
 
     //Remove files in .sgit
+    new File(s"${pathSgit}${File.separator}objects${File.separator}blob${File.separator}39${File.separator}0b184cc8b19c47691caf26bb1f51dc467e3751905e9e3476b1b669a9e04e37").delete()
+    new File(s"${pathSgit}${File.separator}objects${File.separator}blob${File.separator}65${File.separator}7c2456a0aff367f6d6913636e2e848b3b463e3e3c899856971db28b4447eb2").delete()
     new File(s"${pathSgit}${File.separator}objects${File.separator}tree${File.separator}2e${File.separator}e73a5c8b6af285417173f63d33b45e5b6e4cbeb7792929fa9b9310d9ce44f9").delete()
     new File(s"${pathSgit}${File.separator}objects${File.separator}tree${File.separator}3f${File.separator}8477badde5c5fc540d68770cff5b88251fe8949f621dc77779925232a2debf").delete()
     new File(s"${pathSgit}${File.separator}objects${File.separator}tree${File.separator}81${File.separator}0872640304fb4f3739b1ec1afca1fd0d0e3ceee663a1a00eb2b27ee5b4942e").delete()
 
     //Remove directories in .sgit if they are empty
+    if(FileManagement.getListOfFilesAndDirectories(s"${pathSgit}${File.separator}objects${File.separator}blob${File.separator}39").isEmpty) {
+      new Directory(new File(s"${pathSgit}${File.separator}objects${File.separator}blob${File.separator}39")).deleteRecursively()
+    }
+    if(FileManagement.getListOfFilesAndDirectories(s"${pathSgit}${File.separator}objects${File.separator}blob${File.separator}65").isEmpty) {
+      new Directory(new File(s"${pathSgit}${File.separator}objects${File.separator}blob${File.separator}65")).deleteRecursively()
+    }
     if(FileManagement.getListOfFilesAndDirectories(s"${pathSgit}${File.separator}objects${File.separator}tree${File.separator}2e").isEmpty) {
       new Directory(new File(s"${pathSgit}${File.separator}objects${File.separator}tree${File.separator}2e")).deleteRecursively()
     }
     if(FileManagement.getListOfFilesAndDirectories(s"${pathSgit}${File.separator}objects${File.separator}tree${File.separator}3f").isEmpty) {
-      new Directory(new File(s"${pathSgit}${File.separator}objects${File.separator}commit${File.separator}3f")).deleteRecursively()
+      new Directory(new File(s"${pathSgit}${File.separator}objects${File.separator}tree${File.separator}3f")).deleteRecursively()
     }
     if(FileManagement.getListOfFilesAndDirectories(s"${pathSgit}${File.separator}objects${File.separator}tree${File.separator}81").isEmpty) {
       new Directory(new File(s"${pathSgit}${File.separator}objects${File.separator}tree${File.separator}81")).deleteRecursively()

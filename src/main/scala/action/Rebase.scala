@@ -1,12 +1,22 @@
 package action
 
+import util.PathManagement
+
 object Rebase {
 
   def rebase(command: Array[String]): Unit = {
-    println("REBASE " + command.toString)
+    if(PathManagement.getSgitPath().isEmpty){
+      println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
+    } else {
+      println("REBASE " + command.toString)
+    }
   }
 
   def rebaseI(command: Array[String]): Unit = {
-    println("REBASE -I " + command.toString)
+    if(PathManagement.getSgitPath().isEmpty){
+      println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
+    } else {
+      println("REBASE -I " + command.toString)
+    }
   }
 }

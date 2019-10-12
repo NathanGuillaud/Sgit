@@ -6,19 +6,23 @@ import util.{FileManagement, PathManagement, SgitTools, StageManagement}
 
 object Status {
    def status(): Unit = {
-     if(PathManagement.getProjectPath().isEmpty) {
-        println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
-     }
-     //Display the current branch
-     val currentBranch = SgitTools.getCurrentBranch()
-     println("On the branch " + currentBranch)
-
-     if (StageManagement.getAddedFiles(currentBranch).isEmpty && getUpdatedFiles(currentBranch).isEmpty && getUntrackedFiles(currentBranch).isEmpty){
-       println("Nothing to commit, working directory clean")
+     if(PathManagement.getSgitPath().isEmpty){
+       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
      } else {
-       displayAddedFiles(currentBranch)
-       displayUpdatedFiles(currentBranch)
-       displayUntrackedFiles(currentBranch)
+       if(PathManagement.getProjectPath().isEmpty) {
+         println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
+       }
+       //Display the current branch
+       val currentBranch = SgitTools.getCurrentBranch()
+       println("On the branch " + currentBranch)
+
+       if (StageManagement.getAddedFiles(currentBranch).isEmpty && getUpdatedFiles(currentBranch).isEmpty && getUntrackedFiles(currentBranch).isEmpty){
+         println("Nothing to commit, working directory clean")
+       } else {
+         displayAddedFiles(currentBranch)
+         displayUpdatedFiles(currentBranch)
+         displayUntrackedFiles(currentBranch)
+       }
      }
    }
 

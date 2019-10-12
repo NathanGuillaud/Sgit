@@ -2,14 +2,18 @@ package action
 
 import java.io.File
 
-import util.{FileManagement, SgitTools, StageManagement, PathManagement}
+import util.{FileManagement, PathManagement, SgitTools, StageManagement}
 
 object Add {
 
   //Add arguments in the stage
   def add(command: Array[String]): Unit = {
-    val currentBranch = SgitTools.getCurrentBranch()
-    command.map(elem => addElement(new File(new File(elem).getAbsolutePath), currentBranch))
+    if(PathManagement.getSgitPath().isEmpty){
+      println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
+    } else {
+      val currentBranch = SgitTools.getCurrentBranch()
+      command.map(elem => addElement(new File(new File(elem).getAbsolutePath), currentBranch))
+    }
   }
 
   //Add one element to the stage (file or directory)
