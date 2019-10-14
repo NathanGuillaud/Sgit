@@ -8,7 +8,7 @@ import util.{FileManagement, PathManagement, SgitTools, StageManagement}
 import scala.reflect.io.Directory
 
 class TestCheckout extends FunSuite {
-  test("sgit checkout give an old version of a file") {
+  test("sgit checkout with commit hash give an old version of a file") {
     Init.init()
     val currentBranch = SgitTools.getCurrentBranch()
     createTmpFile()
@@ -25,6 +25,50 @@ class TestCheckout extends FunSuite {
     assert(FileManagement.readFile(new File("testCheckout.txt")) == "version1")
 
     removeTmpElements()
+    StageManagement.clearStage(currentBranch)
+  }
+
+  test("sgit checkout with branch name give an old version of a file") {
+    Init.init()
+    val currentBranch = SgitTools.getCurrentBranch()
+    val branchName = "azsq"
+    createTmpFile()
+    //First commit
+    Add.add(Array("testCheckout.txt"))
+    CommitAction.commit()
+    //Second commit
+    Branch.branch(Array(branchName))
+    updateTmpFile()
+    Add.add(Array("testCheckout.txt"))
+    CommitAction.commit()
+    Checkout.checkout(Array(branchName))
+
+    assert(FileManagement.readFile(new File("testCheckout.txt")) == "version1")
+
+    removeTmpElements()
+    removeBranch(branchName)
+    StageManagement.clearStage(currentBranch)
+  }
+
+  test("sgit checkout with tag name give an old version of a file") {
+    Init.init()
+    val currentBranch = SgitTools.getCurrentBranch()
+    val tagName = "1254.3587"
+    createTmpFile()
+    //First commit
+    Add.add(Array("testCheckout.txt"))
+    CommitAction.commit()
+    //Second commit
+    Tag.tag(Array(tagName))
+    updateTmpFile()
+    Add.add(Array("testCheckout.txt"))
+    CommitAction.commit()
+    Checkout.checkout(Array(tagName))
+
+    assert(FileManagement.readFile(new File("testCheckout.txt")) == "version1")
+
+    removeTmpElements()
+    removeTag(tagName)
     StageManagement.clearStage(currentBranch)
   }
 
@@ -60,6 +104,19 @@ class TestCheckout extends FunSuite {
     if(FileManagement.getListOfFilesAndDirectories(s"${pathSgit}${File.separator}objects${File.separator}tree${File.separator}da").isEmpty) {
       new Directory(new File(s"${pathSgit}${File.separator}objects${File.separator}tree${File.separator}da")).deleteRecursively()
     }
+  }
+
+  def removeBranch(branchName: String): Unit = {
+    val pathSgit = PathManagement.getSgitPath().get
+    new File(s"${pathSgit}${File.separator}stages${File.separator}${branchName}").delete()
+    new File(s"${pathSgit}${File.separator}refs${File.separator}heads${File.separator}${branchName}").delete()
+    new File(s"${pathSgit}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${branchName}").delete()
+
+  }
+
+  def removeTag(tagName: String): Unit = {
+    val pathSgit = PathManagement.getSgitPath().get
+    new File(s"${pathSgit}${File.separator}refs${File.separator}tags${File.separator}${tagName}").delete()
   }
 
 }

@@ -33,7 +33,7 @@ object Status {
     if(!addedFiles.isEmpty) {
       println("Changes to be commited:")
       addedFiles.map(file =>
-        println(Console.GREEN + "\t" + file + Console.WHITE)
+        println(Console.GREEN + "\t" + file._1 + ":\t" + file._2 + Console.WHITE)
       )
     }
   }

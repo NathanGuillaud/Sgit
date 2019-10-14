@@ -12,11 +12,16 @@ object StageManagement {
     if(Files.notExists(Paths.get(pathBranchStage))) {
       FileManagement.writeFile(pathBranchStage, pathToAdd + " " + hashId + " added\n")
     } else if (fileHasChange(path, hashId, currentBranch)) {
-      //Remove the last version of the file from the stage
-      removeFileFromStage(pathToAdd, currentBranch)
+      var fileState = "new"
+      //If the file is in the stage
+      if(fileIsInStage(path, currentBranch)) {
+        fileState = "modified"
+        //Remove the last version of the file from the stage
+        removeFileFromStage(pathToAdd, currentBranch)
+      }
       //Add the new version of the file to the stage
       val stageContent = FileManagement.readFile(new File(pathBranchStage))
-      FileManagement.writeFile(pathBranchStage, stageContent + pathToAdd + " " + hashId + " added\n")
+      FileManagement.writeFile(pathBranchStage, stageContent + pathToAdd + " " + hashId + " added " + fileState + "\n")
     }
   }
 
@@ -37,13 +42,29 @@ object StageManagement {
     }
   }
 
+  //Return true if the file in parameters is in the stage (already add or commit), else return false
+  def fileIsInStage(filePath: String, currentBranch: String): Boolean = {
+    var fileInStage = false
+    val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
+    val files = FileManagement.readFile(new File(pathBranchStage))
+    val stageContent = getStageContent(currentBranch)
+    if(stageContent.length > 0 && files != "") {
+      stageContent.map(line =>
+        if(line(0) == filePath) {
+          fileInStage = true
+        }
+      )
+    }
+    fileInStage
+  }
+
   //Archive a file from the stage after a commit (remove the *)
   def archiveFilesFromStage(currentBranch: String): Unit = {
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
     val stageContent = getStageContent(currentBranch)
     var newContent = ""
     stageContent.map(line =>
-      newContent = newContent + line(0) + " " + line(1) + " commited" + "\n"
+      newContent = newContent + line(0) + " " + line(1) + " commited -\n"
     )
     //Write new content in stage
     FileManagement.writeFile(pathBranchStage, newContent)
@@ -79,12 +100,12 @@ object StageManagement {
   }
 
   //Get all files added since the last commit in the stage
-  def getAddedFiles(currentBranch: String): Array[String] = {
-    var addedFiles = Array[String]()
+  def getAddedFiles(currentBranch: String): List[(String, String)] = {
+    var addedFiles = List[(String, String)]()
     val stageContent = getStageContent(currentBranch)
     stageContent.map(line =>
       if(line(2) == "added") {
-        addedFiles = addedFiles :+ line(0)
+        addedFiles = (line(3), line(0)) :: addedFiles
       }
     )
     addedFiles

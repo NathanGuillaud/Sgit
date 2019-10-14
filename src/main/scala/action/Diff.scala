@@ -12,4 +12,6 @@ object Diff {
     }
   }
 
+  def diffBetweenString(list1: List[String], list2: List[String])
+
 }
