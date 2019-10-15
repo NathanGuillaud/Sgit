@@ -61,8 +61,23 @@ case class Commit(
     new File(pathCommitDirectory + s"${File.separator}${commitFileHash}").createNewFile()
     FileManagement.writeFile(pathCommitDirectory + s"${File.separator}${commitFileHash}", this.toString())
   }
+
 }
 
 object Commit {
   //def apply(tId: String): Commit = new Commit("", new Date(), "Nathan Guillaud", tId)
+
+  //Retrieve the root tree for the commit give in parameters
+  def getTreeForCommit(commitHash: String): String = {
+    val commitFolder = commitHash.substring(0,2)
+    val commitFile = commitHash.substring(2)
+    val commitContent = FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}commit${File.separator}${commitFolder}${File.separator}${commitFile}")).split("\n").map(x => x.split("::"))
+    var treeHash = ""
+    commitContent.map(line =>
+      if(line(0) == "tree"){
+        treeHash = line(1)
+      }
+    )
+    treeHash
+  }
 }

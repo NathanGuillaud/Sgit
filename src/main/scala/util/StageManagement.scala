@@ -9,8 +9,9 @@ object StageManagement {
   def addFileInStage(path: String, hashId: String, currentBranch: String): Unit = {
     val pathToAdd = path.replaceAllLiterally("./", "")
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
+    println(path + " --- " + fileHasChange(path, hashId, currentBranch))
     if(Files.notExists(Paths.get(pathBranchStage))) {
-      FileManagement.writeFile(pathBranchStage, pathToAdd + " " + hashId + " added\n")
+      FileManagement.writeFile(pathBranchStage, pathToAdd + " " + hashId + " added new\n")
     } else if (fileHasChange(path, hashId, currentBranch)) {
       var fileState = "new"
       //If the file is in the stage
@@ -21,7 +22,7 @@ object StageManagement {
       }
       //Add the new version of the file to the stage
       val stageContent = FileManagement.readFile(new File(pathBranchStage))
-      FileManagement.writeFile(pathBranchStage, stageContent + pathToAdd + " " + hashId + " added " + fileState + "\n")
+      FileManagement.writeFile(pathBranchStage, stageContent + pathToAdd + " " + hashId + " added " + fileState + " " + "NTM" + "\n")
     }
   }
 
@@ -34,7 +35,7 @@ object StageManagement {
       var newContent = ""
       stageContent.map(line =>
         if(line(0) != filePath) {
-          newContent = newContent + line(0) + " " + line(1) + " " + line(2) + "\n"
+          newContent = newContent + line(0) + " " + line(1) + " " + line(2) + " " + line(3) + "\n"
         }
       )
       //Write new content in stage
@@ -100,12 +101,13 @@ object StageManagement {
   }
 
   //Get all files added since the last commit in the stage
-  def getAddedFiles(currentBranch: String): List[(String, String)] = {
-    var addedFiles = List[(String, String)]()
+  //Return a list of tuples with the stage (new or modified), the path and the hash
+  def getAddedFiles(currentBranch: String): List[(String, String, String)] = {
+    var addedFiles = List[(String, String, String)]()
     val stageContent = getStageContent(currentBranch)
     stageContent.map(line =>
       if(line(2) == "added") {
-        addedFiles = (line(3), line(0)) :: addedFiles
+        addedFiles = (line(3), line(0), line(1)) :: addedFiles
       }
     )
     addedFiles

@@ -5,6 +5,10 @@ import java.math.BigInteger
 import java.nio.file.{Files, Paths}
 import java.security.MessageDigest
 
+import model.Commit
+
+import scala.annotation.tailrec
+
 object FileManagement {
   def getListOfFilesAndDirectories(dir: String):List[File] = {
     val d = new File(dir)
@@ -46,6 +50,39 @@ object FileManagement {
         List(elem)
       }
     )
+  }
+
+  //Return true if the file exists in the commit in parameters, else return false
+  def fileIsInCommit(filePath: String, commitHash: String): Boolean = {
+    def elemIsInTree(currentPath: String, treeHash: String): Boolean = {
+      var isInTree = false
+      FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/tree/" + treeHash.substring(0,2) + "/" + treeHash.substring(2))).split("\n").map(x => x.split(" "))
+        .map(line =>
+          if(filePath == currentPath && currentPath == line(2)) isInTree = true
+          else if(currentPath == line(2)) isInTree = elemIsInTree(currentPath + "/" + filePath.substring(currentPath.length+1).split("/")(0), line(1))
+        )
+      isInTree
+    }
+    elemIsInTree(filePath.split("/")(0), Commit.getTreeForCommit(commitHash))
+  }
+
+  //Return the content of a file for a commit
+  //The file must be in the commit
+  def getFileContentForCommit(filePath: String, commitHash: String): String = {
+    def getFileContentForTree(currentPath: String, treeHash: String): String = {
+      var fileContent = ""
+      FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/tree/" + treeHash.substring(0,2) + "/" + treeHash.substring(2))).split("\n").map(x => x.split(" "))
+        .map(line =>
+          if(filePath == currentPath && currentPath == line(2)) {
+            fileContent = FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + line(1).substring(0,2) + "/" + line(1).substring(2)))
+          }
+          else if(currentPath == line(2)) {
+            fileContent = getFileContentForTree(currentPath + "/" + filePath.substring(currentPath.length+1).split("/")(0), line(1))
+          }
+        )
+      fileContent
+    }
+    getFileContentForTree(filePath.split("/")(0), Commit.getTreeForCommit(commitHash))
   }
 
 }

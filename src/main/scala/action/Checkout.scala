@@ -3,6 +3,7 @@ package action
 import java.io.File
 import java.nio.file.{Files, Paths}
 
+import model.Commit
 import util.{FileManagement, PathManagement}
 
 object Checkout {
@@ -36,7 +37,7 @@ object Checkout {
   //Reset the project with the commit hash given
   def constructProjectFromCommit(commitHash: String): Unit = {
     //Get the tree hash of the commit
-    val commitTreeHash = getTreeForCommit(commitHash)
+    val commitTreeHash = Commit.getTreeForCommit(commitHash)
 
     //Retrieve the content of the tree
     val treeContent = getTreeContent(commitTreeHash)
@@ -88,20 +89,6 @@ object Checkout {
     val blobFolder = blobHash.substring(0,2)
     val blobFile = blobHash.substring(2)
     FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}blob${File.separator}${blobFolder}${File.separator}${blobFile}"))
-  }
-
-  //Retrieve the root tree for the commit give in parameters
-  def getTreeForCommit(commitHash: String): String = {
-    val commitFolder = commitHash.substring(0,2)
-    val commitFile = commitHash.substring(2)
-    val commitContent = FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}commit${File.separator}${commitFolder}${File.separator}${commitFile}")).split("\n").map(x => x.split("::"))
-    var treeHash = ""
-    commitContent.map(line =>
-      if(line(0) == "tree"){
-        treeHash = line(1)
-      }
-    )
-    treeHash
   }
 
   //Return true if the branch give in parameters exists, else return false

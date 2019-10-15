@@ -82,6 +82,7 @@ object Diff {
 
   }
 
+  //Go up the matrix to know elements added or deleted
   def getDeltasFromMatrix(oldList: List[String], newList: List[String], i: Int, j: Int, matrix: Array[Array[Int]], deltas: List[Delta]): List[Delta] = {
     //If we go up the 2 lists
     if(i == 0 && j == 0) deltas
@@ -91,6 +92,41 @@ object Diff {
       //If the old list contains an element removed
       else if(j == 0 || (i > 0 && matrix(i-1)(j) == matrix(i)(j))) getDeltasFromMatrix(oldList, newList, i-1, j, matrix, new Delta(j, "-", oldList(i-1)) :: deltas)
       else getDeltasFromMatrix(oldList, newList, i-1, j-1, matrix, deltas)
+    }
+  }
+
+  //Get the difference between files and the same files in the commit in parameters
+  //Return the number of files changed, the number of insertions, the number of deletions and a list with files created
+  def getDeltasBetweenFilesAndCommit(files: List[(String, String, String)], commitHash: String): (Int, Int, Int, List[String]) = {
+    //If it's not the first commit
+    if(commitHash != "Nil") {
+      var nbInsertions = 0
+      var nbDeletions = 0
+      var newFiles = List[String]()
+      files.map(file =>
+        //If the current file is not a new file
+        if(FileManagement.fileIsInCommit(file._2, commitHash)) {
+          getDeltasBetweenFiles(FileManagement.getFileContentForCommit(file._2, commitHash).split("\n").toList, FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + file._3.substring(0,2) + "/" + file._3.substring(2))).split("\n").toList)
+            .map(delta =>
+              if(delta.action == "+") nbInsertions = nbInsertions + 1
+              else nbDeletions = nbDeletions + 1
+            )
+        } else {
+          newFiles = file._2 :: newFiles
+        }
+      )
+      (files.length, nbInsertions, nbDeletions, newFiles)
+    }
+    //If the commit is the first
+    else {
+      var nbInsertions = 0
+      files.map(file =>
+        FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + file._3.substring(0,2) + "/" + file._3.substring(2))).split("\n")
+          .map(line => nbInsertions = nbInsertions + 1)
+      )
+      var newFiles = List[String]()
+      files.map(file => newFiles = file._2 :: newFiles)
+      (files.length, nbInsertions, 0, newFiles)
     }
   }
 

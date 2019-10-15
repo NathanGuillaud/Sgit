@@ -32,6 +32,9 @@ object CommitAction {
         val commit = new Commit(treeForCommit.get_id(), currentCommitId)
         commit.set_id(commit.generateId())
 
+        //Retrieve changes
+        val (nbFilesChanged, nbInsertions, nbDeletions, newFiles) = Diff.getDeltasBetweenFilesAndCommit(StageManagement.getAddedFiles(currentBranch), currentCommitId)
+
         //Write commit in logs, refs and objects
         LogWriter.updateLogs(commit, currentBranch)
         SgitTools.updateRef(commit.get_id(), currentBranch)
@@ -40,7 +43,9 @@ object CommitAction {
         //Update content from the stage of the current branch to commited
         StageManagement.archiveFilesFromStage(currentBranch)
 
-        println("[" + currentBranch + " " + commit.id + "]")
+        println("[" + currentBranch + " " + commit.id.substring(0,7) + "]")
+        println(" " + nbFilesChanged + " file(s) changed, " + nbInsertions + " insertions(+), " + nbDeletions + " deletions(-)")
+        newFiles.map(file => println(" create " + file))
       }
     }
   }
