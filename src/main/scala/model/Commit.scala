@@ -80,4 +80,19 @@ object Commit {
     )
     treeHash
   }
+
+  //Return the parent commit of the commit in parameters
+  //If the commit is the first, return "Nil"
+  def getParentCommit(commitHash: String): String = {
+    val commitFolder = commitHash.substring(0,2)
+    val commitFile = commitHash.substring(2)
+    val commitContent = FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}commit${File.separator}${commitFolder}${File.separator}${commitFile}")).split("\n").map(x => x.split("::"))
+    var parentCommit = ""
+    commitContent.map(line =>
+      if(line(0) == "parent"){
+        parentCommit = line(1)
+      }
+    )
+    parentCommit
+  }
 }

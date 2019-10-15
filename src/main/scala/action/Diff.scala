@@ -3,7 +3,7 @@ package action
 import java.io.File
 import java.nio.file.{Files, Paths}
 
-import model.Delta
+import model.{Blob, Delta}
 import util.{FileManagement, PathManagement, SgitTools, StageManagement}
 
 object Diff {
@@ -21,11 +21,11 @@ object Diff {
           if(Files.exists(Paths.get(PathManagement.getProjectPath().get + "/" + file(0)))) {
             val newFileContent = FileManagement.readFile(new File(PathManagement.getProjectPath().get + "/" + file(0)))
             val newFileHash = FileManagement.hashFile(file(0).split("/").last, newFileContent)
-            printDiff(file(0), file(1), newFileHash, getDeltasBetweenFiles(FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + file(1).substring(0,2) + "/" + file(1).substring(2))).split("\n").toList, newFileContent.split("\n").toList))
+            printDiff(file(0), file(1), newFileHash, getDeltasBetweenFiles(file(1), newFileHash))
           }
           //If the new file was removed
           else {
-            printDiff(file(0), file(1), "0000000", getDeltasBetweenFiles(FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + file(1).substring(0,2) + "/" + file(1).substring(2))).split("\n").toList, List[String]()))
+            printDiff(file(0), file(1), "0000000", getDeltasBetweenFiles(file(1), "0000000"))
           }
         }
       )
@@ -37,6 +37,7 @@ object Diff {
     if(!deltas.isEmpty) {
       println("diff --git a/" + filePath + " b/" + filePath)
       if(newFileHash == "0000000") println("deleted file")
+      if(oldFileHash == "0000000") println("new file")
       println("index " + oldFileHash.substring(0,7) + ".." + newFileHash.substring(0,7))
       deltas.map(delta =>
         if(delta.action == "+") println(Console.GREEN + delta.action + delta.content + Console.WHITE)
@@ -46,20 +47,35 @@ object Diff {
     }
   }
 
-  def getDeltasBetweenFiles(oldList: List[String], newList: List[String]): List[Delta] = {
-    //If the newFile is empty
-    if(newList.isEmpty){
-      var deltasToReturn = List[Delta]()
-      oldList.map(line => deltasToReturn = new Delta(0, "-", line) :: deltasToReturn)
-      deltasToReturn
-    } else {
-      //Create an empty matrix
-      var matrix = initializeMatrix(oldList, newList)
-      //Fill the matrix with deltas between the 2 lists in parameters
-      matrix = fillMatrix(oldList, newList, 1, 1, matrix)
-      //Retrieve the deltas from the matrix
-      getDeltasFromMatrix(oldList, newList, oldList.length, newList.length, matrix, List[Delta]())
+  //Return a list of deltas between 2 files
+  //The list contains modifications between the 2 version of the file (with the line, the action + or - and the content of the line)
+  def getDeltasBetweenFiles(oldFileHash: String, newFileHash: String): List[Delta] = {
+
+    def getDeltasBetweenLists(oldList: List[String], newList: List[String]): List[Delta] = {
+      //If the newFile is empty
+      if(newList.isEmpty){
+        var deltasToReturn = List[Delta]()
+        oldList.map(line => deltasToReturn = new Delta(0, "-", line) :: deltasToReturn)
+        deltasToReturn
+      } else {
+        //Create an empty matrix
+        var matrix = initializeMatrix(oldList, newList)
+        //Fill the matrix with deltas between the 2 lists in parameters
+        matrix = fillMatrix(oldList, newList, 1, 1, matrix)
+        //Retrieve the deltas from the matrix
+        getDeltasFromMatrix(oldList, newList, oldList.length, newList.length, matrix, List[Delta]())
+      }
     }
+
+    var newFileContent = List[String]()
+    var oldFileContent = List[String]()
+    if(newFileHash != "0000000") {
+      newFileContent = FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + newFileHash.substring(0,2) + "/" + newFileHash.substring(2))).split("\n").toList
+    }
+    if(oldFileHash != "0000000") {
+      oldFileContent = FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + oldFileHash.substring(0,2) + "/" + oldFileHash.substring(2))).split("\n").toList
+    }
+    getDeltasBetweenLists(oldFileContent, newFileContent)
   }
 
   //Create an empty matrix with a size of oldList+1 X newList+1
@@ -105,8 +121,8 @@ object Diff {
       var newFiles = List[String]()
       files.map(file =>
         //If the current file is not a new file
-        if(FileManagement.fileIsInCommit(file._2, commitHash)) {
-          getDeltasBetweenFiles(FileManagement.getFileContentForCommit(file._2, commitHash).split("\n").toList, FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + file._3.substring(0,2) + "/" + file._3.substring(2))).split("\n").toList)
+        if(Blob.fileIsInCommit(file._2, commitHash)) {
+          getDeltasBetweenFiles(Blob.getFileHashInCommit(file._2, commitHash), file._3)
             .map(delta =>
               if(delta.action == "+") nbInsertions = nbInsertions + 1
               else nbDeletions = nbDeletions + 1

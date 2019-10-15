@@ -29,12 +29,4 @@ object Log {
     println("author:" + "\t" + commitValues(1) + "\n" + "date:" + "\t" + commitValues(2) + "\n")
   }
 
-  def logP(): Unit = {
-    println("LOG -P")
-  }
-
-  def logStat(): Unit = {
-    println("LOG --STAT")
-  }
-
 }

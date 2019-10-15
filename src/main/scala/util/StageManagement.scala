@@ -9,7 +9,6 @@ object StageManagement {
   def addFileInStage(path: String, hashId: String, currentBranch: String): Unit = {
     val pathToAdd = path.replaceAllLiterally("./", "")
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
-    println(path + " --- " + fileHasChange(path, hashId, currentBranch))
     if(Files.notExists(Paths.get(pathBranchStage))) {
       FileManagement.writeFile(pathBranchStage, pathToAdd + " " + hashId + " added new\n")
     } else if (fileHasChange(path, hashId, currentBranch)) {

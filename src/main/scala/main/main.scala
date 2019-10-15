@@ -51,8 +51,8 @@ object Main extends App{
 
   def log(command: Array[String]): Unit = command match {
     case Array("log") => Log.log()
-    case Array("log", "-p") => Log.logP()
-    case Array("log", "--stat") => Log.logStat()
+    case Array("log", "-p") => LogP.logP()
+    case Array("log", "--stat") => LogStat.logStat()
     case Array("log", "-p", _*) => println("Command sgit log -p does not contain any other option")
     case Array("log", "--stat", _*) => println("Command sgit log --stat does not contain any other option")
     case default => println("Command log has no option, try sgit log -p or sgit log --stat")
