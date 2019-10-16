@@ -30,11 +30,8 @@ object LogP {
     }
   }
 
+  //Print the deltas details between 2 commits
   def printDeltasBetweenCommits(commitParent: String, commitChild: String): Unit = {
-    //Print commit infos
-
-
-    //print commit deltas
     var filesForParentCommit = List[(String, String)]()
     val filesForChildCommit = Blob.getAllBlobsForCommit(commitChild)
     //If this is not the first commit
