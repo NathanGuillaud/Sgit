@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.{Files, Paths}
 
 import model.Commit
-import util.{FileManagement, PathManagement}
+import util.{FileManagement, PathManagement, SgitTools}
 
 object Checkout {
 
@@ -26,6 +26,7 @@ object Checkout {
   def constructProjectFromBranch(branchName: String): Unit = {
     val commitForBranch = FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}refs${File.separator}heads${File.separator}${branchName}"))
     constructProjectFromCommit(commitForBranch)
+    SgitTools.updateHead(branchName)
   }
 
   //Reset the project with the tag given

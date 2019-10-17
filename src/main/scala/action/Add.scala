@@ -13,7 +13,7 @@ object Add {
       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
     } else {
       val currentBranch = SgitTools.getCurrentBranch()
-      command.map(elem => addElement(new File(new File(elem).getAbsolutePath), currentBranch))
+      command.map(elem => addElement(new File(System.getProperty("user.dir") + File.separator + elem), currentBranch))
     }
   }
 

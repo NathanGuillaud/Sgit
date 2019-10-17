@@ -33,7 +33,7 @@ object PathManagement {
 
   //Get the absolute path of a the .sgit repository for the project
   @tailrec
-  def getSgitPath(currentDirectory: File = new File(".")): Option[String] = {
+  def getSgitPath(currentDirectory: File = new File(System.getProperty("user.dir"))): Option[String] = {
     val currentCanonical = currentDirectory.getCanonicalFile()
     if (new File(s"${currentDirectory.getAbsolutePath()}${File.separatorChar}.sgit").isDirectory())
       Some(s"${currentCanonical.getAbsolutePath()}${File.separator}.sgit")

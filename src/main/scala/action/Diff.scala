@@ -21,11 +21,11 @@ object Diff {
           if(Files.exists(Paths.get(PathManagement.getProjectPath().get + "/" + file(0)))) {
             val newFileContent = FileManagement.readFile(new File(PathManagement.getProjectPath().get + "/" + file(0)))
             val newFileHash = FileManagement.hashFile(file(0).split("/").last, newFileContent)
-            printDiff(file(0), file(1), newFileHash, getDeltasBetweenFiles(file(1), newFileHash))
+            printDiff(file(0), file(1), newFileHash, getDeltasBetweenFiles(file(1), Some(file(0))))
           }
           //If the new file was removed
           else {
-            printDiff(file(0), file(1), "0000000", getDeltasBetweenFiles(file(1), "0000000"))
+            printDiff(file(0), file(1), "0000000", getDeltasBetweenFiles(file(1), None))
           }
         }
       )
@@ -49,7 +49,7 @@ object Diff {
 
   //Return a list of deltas between 2 files
   //The list contains modifications between the 2 version of the file (with the line, the action + or - and the content of the line)
-  def getDeltasBetweenFiles(oldFileHash: String, newFileHash: String): List[Delta] = {
+  def getDeltasBetweenFiles(oldFileHash: String, newFilePath: Option[String]): List[Delta] = {
 
     def getDeltasBetweenLists(oldList: List[String], newList: List[String]): List[Delta] = {
       //If the newFile is empty
@@ -69,8 +69,8 @@ object Diff {
 
     var newFileContent = List[String]()
     var oldFileContent = List[String]()
-    if(newFileHash != "0000000") {
-      newFileContent = FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + newFileHash.substring(0,2) + "/" + newFileHash.substring(2))).split("\n").toList
+    if(!newFilePath.isEmpty) {
+      newFileContent = FileManagement.readFile(new File(PathManagement.getProjectPath().get + "/" + newFilePath.get)).split("\n").toList
     }
     if(oldFileHash != "0000000") {
       oldFileContent = FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + oldFileHash.substring(0,2) + "/" + oldFileHash.substring(2))).split("\n").toList
@@ -122,7 +122,7 @@ object Diff {
       files.map(file =>
         //If the current file is not a new file
         if(Blob.fileIsInCommit(file._2, commitHash)) {
-          getDeltasBetweenFiles(Blob.getFileHashInCommit(file._2, commitHash), file._3)
+          getDeltasBetweenFiles(Blob.getFileHashInCommit(file._2, commitHash), Some(file._2))
             .map(delta =>
               if(delta.action == "+") nbInsertions = nbInsertions + 1
               else nbDeletions = nbDeletions + 1

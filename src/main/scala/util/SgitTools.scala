@@ -42,4 +42,8 @@ object SgitTools {
     }
   }
 
+  def updateHead(newBranch: String): Unit = {
+    FileManagement.writeFile(s"${PathManagement.getSgitPath().get}${File.separator}HEAD", s"ref: refs/heads/${newBranch}")
+  }
+
 }

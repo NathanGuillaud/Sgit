@@ -45,14 +45,14 @@ object LogP {
           file._1,
           FileManagement.getFileHashFromList(file._1, filesForParentCommit),
           file._2,
-          Diff.getDeltasBetweenFiles(FileManagement.getFileHashFromList(file._1, filesForParentCommit), file._2)
+          Diff.getDeltasBetweenFiles(FileManagement.getFileHashFromList(file._1, filesForParentCommit), Some(file._1))
         )
       else
         Diff.printDiff(
           file._1,
           "0000000",
           file._2,
-          Diff.getDeltasBetweenFiles("0000000", file._2)
+          Diff.getDeltasBetweenFiles("0000000", Some(file._1))
         )
     )
   }

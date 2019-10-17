@@ -21,7 +21,7 @@ object StageManagement {
       }
       //Add the new version of the file to the stage
       val stageContent = FileManagement.readFile(new File(pathBranchStage))
-      FileManagement.writeFile(pathBranchStage, stageContent + pathToAdd + " " + hashId + " added " + fileState + " " + "NTM" + "\n")
+      FileManagement.writeFile(pathBranchStage, stageContent + pathToAdd + " " + hashId + " added " + fileState + "\n")
     }
   }
 

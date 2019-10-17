@@ -43,7 +43,7 @@ object LogStat {
     val totalModifications = filesForChildCommit.map(file =>
       printModificationsBetweenFiles(
         file._1,
-        Diff.getDeltasBetweenFiles(FileManagement.getFileHashFromList(file._1, filesForParentCommit), file._2)
+        Diff.getDeltasBetweenFiles(FileManagement.getFileHashFromList(file._1, filesForParentCommit), Some(file._1))
       )
     ).reduce((acc, value) => (acc._1 + value._1, acc._2 + value._2, acc._3 + value._3))
     println(totalModifications._1 + " file(s) changed, " + totalModifications._2 + " insertion(s), " + totalModifications._3 + " deletion(s)")
