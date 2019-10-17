@@ -3,9 +3,7 @@ package action
 import java.io.File
 
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
-import util.{FileManagement, PathManagement, SgitTools, StageManagement, TestEnvironment}
-
-import scala.reflect.io.Directory
+import util.{FileManagement, SgitTools, TestEnvironment}
 
 class TestCheckout extends FunSuite with BeforeAndAfterEach {
 

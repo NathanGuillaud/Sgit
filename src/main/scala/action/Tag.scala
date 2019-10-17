@@ -12,9 +12,11 @@ object Tag {
     if(PathManagement.getSgitPath().isEmpty){
       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
     } else {
+      //Retrieve current branch
       val currentBranch = SgitTools.getCurrentBranch()
+      val pathRefsHeads = s"${PathManagement.getSgitPath().get}${File.separator}refs${File.separator}heads${File.separator}"
       val pathTags = s"${PathManagement.getSgitPath().get}${File.separator}refs${File.separator}tags"
-      if(Files.notExists(Paths.get(pathTags))) {
+      if(Files.notExists(Paths.get(pathRefsHeads + s"${currentBranch}"))) {
         println("You have to make a first commit before create a new tag")
       }
       //If the tag already exists

@@ -52,20 +52,6 @@ class TestCommit extends FunSuite with BeforeAndAfterEach {
     assert(Source.fromFile(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}HEAD").getLines.length == nbOfCommits + 1)
   }
 
-  test("sgit commit add 1 line in logs/refs/heads/master") {
-    Init.init()
-    val currentBranch = SgitTools.getCurrentBranch()
-    var nbOfCommitMaster = 0
-    if(Files.exists(Paths.get(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${currentBranch}"))) {
-        nbOfCommitMaster = Source.fromFile(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${currentBranch}").getLines.length
-    }
-    Add.add(Array("testCommit", "rootTestCommit.txt"))
-
-    CommitAction.commit()
-
-    assert(Source.fromFile(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${currentBranch}").getLines.length == nbOfCommitMaster + 1)
-  }
-
   test("sgit commit add 1 line in refs/heads/master") {
     Init.init()
     val currentBranch = SgitTools.getCurrentBranch()

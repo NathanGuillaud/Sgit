@@ -3,7 +3,7 @@ package action
 import java.io.File
 
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
-import util.{FileManagement, PathManagement, SgitTools, StageManagement, TestEnvironment}
+import util.{FileManagement, SgitTools, TestEnvironment}
 
 class TestAdd extends FunSuite with BeforeAndAfterEach {
 

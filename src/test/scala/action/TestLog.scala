@@ -3,11 +3,22 @@ package action
 import java.io.File
 import java.nio.file.{Files, Paths}
 
-import org.scalatest.FunSuite
+import org.scalatest.{BeforeAndAfterEach, FunSuite}
+import util.{PathManagement, SgitTools, TestEnvironment}
 
 import scala.io.Source
 
-class TestLog extends FunSuite {
+class TestLog extends FunSuite with BeforeAndAfterEach {
+
+  override protected def beforeEach(): Unit = {
+    TestEnvironment.createTestDirectory()
+    TestEnvironment.goToTestDirectory()
+    createTmpDirectories()
+  }
+  override protected def afterEach(): Unit = {
+    TestEnvironment.deleteTestDirectory()
+  }
+
   /*test("sgit log should print all the commits") {
     Init.init()
     Log.log()
@@ -23,4 +34,39 @@ class TestLog extends FunSuite {
     val nbLinesPrinted = nbLinesForLog
     assert(nbLinesPrinted == nbLinesForLog)
   }*/
+
+  test("1 line is added in logs/refs/heads/master file when commit") {
+    Init.init()
+    val currentBranch = SgitTools.getCurrentBranch()
+    var nbOfCommitMaster = 0
+    if(Files.exists(Paths.get(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${currentBranch}"))) {
+      nbOfCommitMaster = Source.fromFile(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${currentBranch}").getLines.length
+    }
+    Add.add(Array("testCommit", "rootTestCommit.txt"))
+
+    CommitAction.commit()
+
+    assert(Source.fromFile(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${currentBranch}").getLines.length == nbOfCommitMaster + 1)
+  }
+
+  test("1 line is added in logs/HEAD file when commit") {
+    Init.init()
+    val currentBranch = SgitTools.getCurrentBranch()
+    var nbOfCommitMaster = 0
+    if(Files.exists(Paths.get(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}HEAD"))) {
+      nbOfCommitMaster = Source.fromFile(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}HEAD").getLines.length
+    }
+    Add.add(Array("testCommit", "rootTestCommit.txt"))
+
+    CommitAction.commit()
+
+    assert(Source.fromFile(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${currentBranch}").getLines.length == nbOfCommitMaster + 1)
+  }
+
+  def createTmpDirectories(): Unit = {
+    new File(s"${System.getProperty("user.dir")}${File.separator}testCommit").mkdirs()
+    new File(s"${System.getProperty("user.dir")}${File.separator}testCommit${File.separator}testCommit.txt").createNewFile()
+    new File(s"${System.getProperty("user.dir")}${File.separator}rootTestCommit.txt").createNewFile()
+  }
+
 }
