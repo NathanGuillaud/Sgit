@@ -42,7 +42,7 @@ class TestLog extends FunSuite with BeforeAndAfterEach {
     if(Files.exists(Paths.get(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${currentBranch}"))) {
       nbOfCommitMaster = Source.fromFile(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}refs${File.separator}heads${File.separator}${currentBranch}").getLines.length
     }
-    Add.add(Array("testCommit", "rootTestCommit.txt"))
+    Add.add(Array("testLog", "rootTestLog.txt"))
 
     CommitAction.commit()
 
@@ -56,7 +56,7 @@ class TestLog extends FunSuite with BeforeAndAfterEach {
     if(Files.exists(Paths.get(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}HEAD"))) {
       nbOfCommitMaster = Source.fromFile(s"${PathManagement.getSgitPath().get}${File.separator}logs${File.separator}HEAD").getLines.length
     }
-    Add.add(Array("testCommit", "rootTestCommit.txt"))
+    Add.add(Array("testLog", "rootTestLog.txt"))
 
     CommitAction.commit()
 
@@ -64,9 +64,9 @@ class TestLog extends FunSuite with BeforeAndAfterEach {
   }
 
   def createTmpDirectories(): Unit = {
-    new File(s"${System.getProperty("user.dir")}${File.separator}testCommit").mkdirs()
-    new File(s"${System.getProperty("user.dir")}${File.separator}testCommit${File.separator}testCommit.txt").createNewFile()
-    new File(s"${System.getProperty("user.dir")}${File.separator}rootTestCommit.txt").createNewFile()
+    new File(s"${System.getProperty("user.dir")}${File.separator}testLog").mkdirs()
+    new File(s"${System.getProperty("user.dir")}${File.separator}testLog${File.separator}testLog.txt").createNewFile()
+    new File(s"${System.getProperty("user.dir")}${File.separator}rootTestLog.txt").createNewFile()
   }
 
 }

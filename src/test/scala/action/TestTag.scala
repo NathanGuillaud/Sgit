@@ -26,7 +26,7 @@ class TestTag extends FunSuite with BeforeAndAfterEach {
 
   test("sgit tag should create a reference of the tag in .sgit directory") {
     Init.init()
-    Add.add(Array("testCommit", "rootTestCommit.txt"))
+    Add.add(Array("testTag", "rootTestTag.txt"))
     CommitAction.commit()
     Tag.tag(Array("q4s5d6"))
     assert(new File(s"${System.getProperty("user.dir")}${File.separator}.sgit${File.separator}refs${File.separator}tags${File.separator}q4s5d6").exists())
@@ -34,7 +34,7 @@ class TestTag extends FunSuite with BeforeAndAfterEach {
 
   test("tag file in .sgit directory should contains 1 line with the current commit") {
     Init.init()
-    Add.add(Array("testCommit", "rootTestCommit.txt"))
+    Add.add(Array("testTag", "rootTestTag.txt"))
     CommitAction.commit()
     val currentCommit = SgitTools.getCurrentCommit(SgitTools.getCurrentBranch())
     Tag.tag(Array("q4s5d6"))
@@ -43,9 +43,9 @@ class TestTag extends FunSuite with BeforeAndAfterEach {
   }
 
   def createTmpDirectories(): Unit = {
-    new File(s"${System.getProperty("user.dir")}${File.separator}testCommit").mkdirs()
-    new File(s"${System.getProperty("user.dir")}${File.separator}testCommit${File.separator}testCommit.txt").createNewFile()
-    new File(s"${System.getProperty("user.dir")}${File.separator}rootTestCommit.txt").createNewFile()
+    new File(s"${System.getProperty("user.dir")}${File.separator}testTag").mkdirs()
+    new File(s"${System.getProperty("user.dir")}${File.separator}testTag${File.separator}testTag.txt").createNewFile()
+    new File(s"${System.getProperty("user.dir")}${File.separator}rootTestTag.txt").createNewFile()
   }
 
 }

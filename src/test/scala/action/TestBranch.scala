@@ -26,7 +26,7 @@ class TestBranch extends FunSuite with BeforeAndAfterEach {
 
   test("sgit branch should create new reference file") {
     Init.init()
-    Add.add(Array("testCommit", "rootTestCommit.txt"))
+    Add.add(Array("testBranch", "rootTestBranch.txt"))
     CommitAction.commit()
     Branch.branch(Array("a7z8e9"))
     assert(new File(s"${System.getProperty("user.dir")}${File.separator}.sgit${File.separator}refs${File.separator}heads${File.separator}a7z8e9").exists())
@@ -34,7 +34,7 @@ class TestBranch extends FunSuite with BeforeAndAfterEach {
 
   test("branch file in .sgit directory should contains 1 line with the current commit") {
     Init.init()
-    Add.add(Array("testCommit", "rootTestCommit.txt"))
+    Add.add(Array("testBranch", "rootTestBranch.txt"))
     CommitAction.commit()
     val currentCommit = SgitTools.getCurrentCommit(SgitTools.getCurrentBranch())
     Branch.branch(Array("a7z8e9"))
@@ -43,9 +43,9 @@ class TestBranch extends FunSuite with BeforeAndAfterEach {
   }
 
   def createTmpDirectories(): Unit = {
-    new File(s"${System.getProperty("user.dir")}${File.separator}testCommit").mkdirs()
-    new File(s"${System.getProperty("user.dir")}${File.separator}testCommit${File.separator}testCommit.txt").createNewFile()
-    new File(s"${System.getProperty("user.dir")}${File.separator}rootTestCommit.txt").createNewFile()
+    new File(s"${System.getProperty("user.dir")}${File.separator}testBranch").mkdirs()
+    new File(s"${System.getProperty("user.dir")}${File.separator}testBranch${File.separator}testBranch.txt").createNewFile()
+    new File(s"${System.getProperty("user.dir")}${File.separator}rootTestBranch.txt").createNewFile()
   }
 
 }
