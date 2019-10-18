@@ -8,7 +8,7 @@ object Merge {
     if(PathManagement.getSgitPath().isEmpty){
       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
     } else {
-      println("MERGE " + command.toString)
+      println("MERGE : TO DO")
     }
   }
 

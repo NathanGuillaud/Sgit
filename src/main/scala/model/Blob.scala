@@ -15,12 +15,12 @@ object Blob{
       val fileName = decomposedFilePath(decomposedFilePath.length-1)
       val fileContent = FileManagement.readFile(path)
 
-      //Hachage du fichier
+      //File hash
       val hashValue = FileManagement.hashFile(fileName, fileContent)
       val folderHash = hashValue.substring(0,2)
       val fileHash = hashValue.substring(2)
 
-      //Création du blob dans son répertoire
+      //Blob creation in directory
       val blobDirectory = s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}blob${File.separator}${folderHash}"
       new File(blobDirectory).mkdirs()
       new File(blobDirectory + s"${File.separator}${fileHash}").createNewFile()

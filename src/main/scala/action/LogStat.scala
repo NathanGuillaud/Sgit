@@ -57,7 +57,7 @@ object LogStat {
       val nbInsertions = getNumberOfActionInDeltas("+", deltas)
       val nbDeletions = getNumberOfActionInDeltas("-", deltas)
       println(filePath + "\t| " + (nbInsertions+nbDeletions) + " " + Console.GREEN + "+"*nbInsertions + Console.RED + "-"*nbDeletions + Console.WHITE)
-      (0, nbInsertions, nbDeletions)
+      (1, nbInsertions, nbDeletions)
     } else {
       (0,0,0)
     }

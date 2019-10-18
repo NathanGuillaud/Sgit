@@ -51,13 +51,7 @@ object Commit {
     val commitFolder = commitHash.substring(0,2)
     val commitFile = commitHash.substring(2)
     val commitContent = FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}commit${File.separator}${commitFolder}${File.separator}${commitFile}")).split("\n").map(x => x.split("::"))
-    var treeHash = ""
-    commitContent.map(line =>
-      if(line(0) == "tree"){
-        treeHash = line(1)
-      }
-    )
-    treeHash
+    commitContent.filter(line => line(0) == "tree").map(line => line(1)).last
   }
 
   //Return the parent commit of the commit in parameters
@@ -66,12 +60,6 @@ object Commit {
     val commitFolder = commitHash.substring(0,2)
     val commitFile = commitHash.substring(2)
     val commitContent = FileManagement.readFile(new File(s"${PathManagement.getSgitPath().get}${File.separator}objects${File.separator}commit${File.separator}${commitFolder}${File.separator}${commitFile}")).split("\n").map(x => x.split("::"))
-    var parentCommit = ""
-    commitContent.map(line =>
-      if(line(0) == "parent"){
-        parentCommit = line(1)
-      }
-    )
-    parentCommit
+    commitContent.filter(line => line(0) == "parent").map(line => line(1)).last
   }
 }

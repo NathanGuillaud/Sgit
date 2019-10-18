@@ -47,37 +47,19 @@ object CommitAction {
   }
 
   //Create a list with all elements of the stage
+  //Return 2 lists of elements : 1 with files not at root and 1 with files at root
   def getStageFiles(currentBranch: String): (List[Element], List[Element]) = {
-    var rootBlobs = List[Element]()
-    //Retrieve useful data
-    val stage = new File(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}")
-    val files = FileManagement.readFile(stage)
-
-    //Split lines
-    val stage_content = files.split("\n").map(x => x.split(" "))
-
-    //Cleaning from the filenames
-    var paths = List[String]()
-    stage_content.map(x =>
-      if(PathManagement.getParentPath(x(0)).isEmpty) {
-        rootBlobs = new Element(x(0), x(1), "blob") :: rootBlobs
-      } else {
-        paths = x(0) :: paths
-      }
-    )
-    var hashs = List[String]()
-    stage_content.map(x =>
-      if(!PathManagement.getParentPath(x(0)).isEmpty) {
-        hashs = x(1) :: hashs
-      }
-    )
+    val stageContent = StageManagement.getStageContent(SgitTools.getCurrentBranch())
+    //Get the paths
+    val paths = stageContent.filter(file => !PathManagement.getParentPath(file(0)).isEmpty).map(file => file(0))
+    //Get the blobs at root
+    val rootBlobs = stageContent.filter(file => PathManagement.getParentPath(file(0)).isEmpty).map(file => new Element(file(0), file(1), "blob")).toList
     val blob = List.fill(paths.size)("blob")
+    //Get the hashs
+    val hashs = stageContent.filter(file => !PathManagement.getParentPath(file(0)).isEmpty).map(file => file(1))
 
     //Merging the result
-    var elements = List[Element]()
-    (paths,hashs,blob).zipped.toList.map(elem =>
-      elements = new Element(elem._1, elem._2, elem._3) :: elements
-    )
+    val elements = (paths,hashs,blob).zipped.toList.map(elem => Element(elem._1, elem._2, elem._3))
     (elements, rootBlobs)
   }
 

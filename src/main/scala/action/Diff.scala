@@ -54,27 +54,22 @@ object Diff {
     def getDeltasBetweenLists(oldList: List[String], newList: List[String]): List[Delta] = {
       //If the newFile is empty
       if(newList.isEmpty){
-        var deltasToReturn = List[Delta]()
-        oldList.map(line => deltasToReturn = new Delta(0, "-", line) :: deltasToReturn)
-        deltasToReturn
+        oldList.map(line => Delta(0, "-", line))
       } else {
-        //Create an empty matrix
-        var matrix = initializeMatrix(oldList, newList)
-        //Fill the matrix with deltas between the 2 lists in parameters
-        matrix = fillMatrix(oldList, newList, 1, 1, matrix)
+        //Create and fill a matrix with deltas between the 2 lists in parameters
+        val matrix = fillMatrix(oldList, newList, 1, 1, initializeMatrix(oldList, newList))
         //Retrieve the deltas from the matrix
         getDeltasFromMatrix(oldList, newList, oldList.length, newList.length, matrix, List[Delta]())
       }
     }
 
-    var newFileContent = List[String]()
-    var oldFileContent = List[String]()
-    if(!newFilePath.isEmpty) {
-      newFileContent = FileManagement.readFile(new File(PathManagement.getProjectPath().get + "/" + newFilePath.get)).split("\n").toList
-    }
-    if(oldFileHash != "0000000") {
-      oldFileContent = FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + oldFileHash.substring(0,2) + "/" + oldFileHash.substring(2))).split("\n").toList
-    }
+    val newFileContent = if(!newFilePath.isEmpty)
+      FileManagement.readFile(new File(PathManagement.getProjectPath().get + "/" + newFilePath.get)).split("\n").toList
+    else List[String]()
+    val oldFileContent = if(oldFileHash != "0000000")
+      FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + oldFileHash.substring(0,2) + "/" + oldFileHash.substring(2))).split("\n").toList
+    else List[String]()
+
     getDeltasBetweenLists(oldFileContent, newFileContent)
   }
 
@@ -122,7 +117,9 @@ object Diff {
       files.map(file => {
         //If the current file is not a new file
         var oldFileHash = "0000000"
+        println(file._2 + " - " + Blob.fileIsInCommit(file._2, commitHash))
         if(Blob.fileIsInCommit(file._2, commitHash)) {
+          println(file._2 + " - " + Blob.getFileHashInCommit(file._2, commitHash))
           oldFileHash = Blob.getFileHashInCommit(file._2, commitHash)
         } else {
           newFiles = file._2 :: newFiles
@@ -137,13 +134,11 @@ object Diff {
     }
     //If the commit is the first
     else {
-      var nbInsertions = 0
-      files.map(file =>
+      val nbInsertions = files.map(file =>
         FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + file._3.substring(0,2) + "/" + file._3.substring(2))).split("\n")
-          .map(line => nbInsertions = nbInsertions + 1)
-      )
-      var newFiles = List[String]()
-      files.map(file => newFiles = file._2 :: newFiles)
+          .length
+      ).sum
+      val newFiles = files.map(file => file._2)
       (files.length, nbInsertions, 0, newFiles)
     }
   }

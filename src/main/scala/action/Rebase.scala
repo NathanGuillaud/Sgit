@@ -8,7 +8,7 @@ object Rebase {
     if(PathManagement.getSgitPath().isEmpty){
       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
     } else {
-      println("REBASE " + command.toString)
+      println("REBASE : TO DO")
     }
   }
 
@@ -16,7 +16,7 @@ object Rebase {
     if(PathManagement.getSgitPath().isEmpty){
       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
     } else {
-      println("REBASE -I " + command.toString)
+      println("REBASE -I : TO DO")
     }
   }
 }
