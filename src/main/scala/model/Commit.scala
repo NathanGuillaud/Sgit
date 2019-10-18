@@ -7,35 +7,14 @@ import util.{FileManagement, PathManagement}
 
 case class Commit(
                  var id: String = "",
-                 val date: Date = new Date(),
-                 val author: String = "Nathan Guillaud",
+                 date: Date = new Date(),
+                 author: String = "Nathan Guillaud",
                  var treeId: String = "",
                  var parentCommit: String = ""
                  ) {
-  def this(treeId: String, parentCommit: String) = this("", new Date(), "Nathan Guillaud", treeId, parentCommit)
-
-  def get_id(): String = {
-    this.id
-  }
-
-  def set_id(id: String): Unit = {
-    this.id = id
-  }
-
-  def get_date(): Date = {
-    this.date
-  }
-
-  def get_author(): String = {
-    this.author
-  }
-
-  def get_tree_id(): String = {
-    this.treeId
-  }
-
-  def get_parent_commit(): String = {
-    this.parentCommit
+  def this(treeId: String, parentCommit: String) = {
+    this("", new Date(), "Nathan Guillaud", treeId, parentCommit)
+    this.id = generateId()
   }
 
   def generateId(): String = {
@@ -43,7 +22,7 @@ case class Commit(
   }
 
   override def toString(): String = {
-    "date::" + this.get_date() + "\n" + "author::" + this.get_author() + "\n" + "tree::" + this.get_tree_id() + "\n" + "parent::" + this.get_parent_commit()
+    "date::" + this.date + "\n" + "author::" + this.author + "\n" + "tree::" + this.treeId + "\n" + "parent::" + this.parentCommit
   }
 
   def toStringForLogs(): String = {
@@ -51,7 +30,7 @@ case class Commit(
   }
 
   def saveCommitFile(): Unit = {
-    val commitHashValue = this.get_id()
+    val commitHashValue = this.id
     val commitFolderHash = commitHashValue.substring(0,2)
     val commitFileHash = commitHashValue.substring(2)
 

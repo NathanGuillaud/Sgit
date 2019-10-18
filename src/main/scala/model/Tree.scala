@@ -9,47 +9,44 @@ case class Tree(
                var content: List[Element] = List()
                ) {
 
-  def get_content(): List[Element] = {
-    this.content
+  def this(blobs: List[Element], trees: List[Element]) = {
+    this()
+    trees.map(t =>
+      this.content = Element(t.path, t.hash, t.elemType) :: this.content
+    )
+    blobs.map(b =>
+      this.content = Element(b.path, b.hash, b.elemType) :: this.content
+    )
+    this.id = generateId()
   }
 
-  def set_content(c: List[Element]): Unit = {
-    this.content = c
-  }
-
-  def get_id(): String = {
-    this.id
-  }
-
-  def set_id(id: String): Unit = {
-    this.id = id
-  }
-
-  def addElement(elementType: String, id: String, name: String): List[Element] = {
-    new Element(name, id, elementType) :: get_content()
+  def this(elements: List[Element]) = {
+    this()
+    elements.map(element => this.content = Element(element.path, element.hash, element.elemType) :: this.content)
+    this.id = generateId()
   }
 
   def generateId(): String = {
     FileManagement.hashTreeOrCommit(this.toString())
   }
 
-  def fillWithBlobsAndTrees(blobs: List[Element], trees: List[Element]): Unit = {
+  /*def fillWithBlobsAndTrees(blobs: List[Element], trees: List[Element]): Unit = {
     trees.map(t =>
       this.set_content(this.addElement(t.get_elem_type(), t.get_hash(), t.get_path()))
     )
     blobs.map(b =>
       this.set_content(this.addElement(b.get_elem_type(), b.get_hash(), b.get_path()))
     )
-  }
+  }*/
 
   override def toString(): String = {
     var display: String = ""
-    this.get_content().map(x => display = display + x.get_elem_type() + " " + x.get_hash() + " " + x.get_path() + "\n")
+    this.content.map(x => display = display + x.elemType + " " + x.hash + " " + x.path + "\n")
     display
   }
 
   def saveTreeFile(): Unit = {
-    val treeHashValue = this.get_id()
+    val treeHashValue = this.id
     val treeFolderHash = treeHashValue.substring(0,2)
     val treeFileHash = treeHashValue.substring(2)
 

@@ -119,18 +119,20 @@ object Diff {
       var nbInsertions = 0
       var nbDeletions = 0
       var newFiles = List[String]()
-      files.map(file =>
+      files.map(file => {
         //If the current file is not a new file
+        var oldFileHash = "0000000"
         if(Blob.fileIsInCommit(file._2, commitHash)) {
-          getDeltasBetweenFiles(Blob.getFileHashInCommit(file._2, commitHash), Some(file._2))
-            .map(delta =>
-              if(delta.action == "+") nbInsertions = nbInsertions + 1
-              else nbDeletions = nbDeletions + 1
-            )
+          oldFileHash = Blob.getFileHashInCommit(file._2, commitHash)
         } else {
           newFiles = file._2 :: newFiles
         }
-      )
+        getDeltasBetweenFiles(oldFileHash, Some(file._2))
+          .map(delta =>
+            if(delta.action == "+") nbInsertions = nbInsertions + 1
+            else nbDeletions = nbDeletions + 1
+          )
+      })
       (files.length, nbInsertions, nbDeletions, newFiles)
     }
     //If the commit is the first

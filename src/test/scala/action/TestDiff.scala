@@ -50,7 +50,7 @@ class TestDiff extends FunSuite with BeforeAndAfterEach {
     val hash = FileManagement.hashFile("rootTestDiff.txt", FileManagement.readFile(new File(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt")))
     val nbLinesOfNewFile = FileManagement.readFile(new File(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt")).split("\n").length
     val deltas = Diff.getDeltasBetweenFiles(hash, None)
-    
+
     assert(LogStat.getNumberOfActionInDeltas("-", deltas) == nbLinesOfNewFile)
     assert(LogStat.getNumberOfActionInDeltas("+", deltas) == 0)
   }

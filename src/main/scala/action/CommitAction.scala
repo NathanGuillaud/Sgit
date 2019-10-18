@@ -13,7 +13,6 @@ object CommitAction {
       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
     } else {
       val currentBranch = SgitTools.getCurrentBranch()
-      val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
       //If the stage is empty, nothing to commit
       if(!StageManagement.containsNewFiles(currentBranch)) {
         println("Nothing to commit")
@@ -22,22 +21,19 @@ object CommitAction {
         val rootTrees = addTrees(stage, None)
 
         //Create the tree for commit
-        val treeForCommit = new Tree()
-        treeForCommit.fillWithBlobsAndTrees(rootBlobs, rootTrees)
-        treeForCommit.set_id(treeForCommit.generateId())
+        val treeForCommit = new Tree(rootBlobs, rootTrees)
         treeForCommit.saveTreeFile()
 
         //Create the new commit
         val currentCommitId = SgitTools.getCurrentCommit(currentBranch)
-        val commit = new Commit(treeForCommit.get_id(), currentCommitId)
-        commit.set_id(commit.generateId())
+        val commit = new Commit(treeForCommit.id, currentCommitId)
 
         //Retrieve changes
         val (nbFilesChanged, nbInsertions, nbDeletions, newFiles) = Diff.getDeltasBetweenFilesAndCommit(StageManagement.getAddedFiles(currentBranch), currentCommitId)
 
         //Write commit in logs, refs and objects
         LogWriter.updateLogs(commit, currentBranch)
-        SgitTools.updateRef(commit.get_id(), currentBranch)
+        SgitTools.updateRef(commit.id, currentBranch)
         commit.saveCommitFile()
 
         //Update content from the stage of the current branch to commited
@@ -99,24 +95,21 @@ object CommitAction {
       val hash = createTree(deeperList)
       if(parentPath.isEmpty) {
         if (rootTrees.isEmpty){
-          addTrees(restList, Some(List(new Element(PathManagement.getParentPath(deeperList(0).get_path()).get, hash, "tree"))))
+          addTrees(restList, Some(List(new Element(PathManagement.getParentPath(deeperList(0).path).get, hash, "tree"))))
         } else {
-          addTrees(restList, Some(new Element(PathManagement.getParentPath(deeperList(0).get_path()).get, hash, "tree") :: rootTrees.get))
+          addTrees(restList, Some(new Element(PathManagement.getParentPath(deeperList(0).path).get, hash, "tree") :: rootTrees.get))
         }
       } else {
-        addTrees(new Element(PathManagement.getParentPath(deeperList(0).get_path()).get, hash, "tree") :: restList, rootTrees)
+        addTrees(new Element(PathManagement.getParentPath(deeperList(0).path).get, hash, "tree") :: restList, rootTrees)
       }
     }
   }
 
   //Create a tree and return his hash value
   def createTree(deeper: List[Element]): String = {
-    val tree = new Tree()
-    deeper.map(element => tree.set_content(tree.addElement(element.get_elem_type(), element.get_hash(), element.get_path())))
-    val hash = tree.generateId()
-    tree.set_id(hash)
+    val tree = new Tree(deeper)
     tree.saveTreeFile()
-    tree.get_id()
+    tree.id
   }
 
   //Find the deeper directory of a list
@@ -125,13 +118,13 @@ object CommitAction {
     var max = 0
     var pathForMax = ""
 
-    l.map(line => if (PathManagement.getParentPath(line.get_path()).get.split("/").size >= max) {
-      max = PathManagement.getParentPath(line.get_path()).get.split("/").size
-      pathForMax = PathManagement.getParentPath(line.get_path()).get
+    l.map(line => if (PathManagement.getParentPath(line.path).get.split("/").size >= max) {
+      max = PathManagement.getParentPath(line.path).get.split("/").size
+      pathForMax = PathManagement.getParentPath(line.path).get
     })
 
-    val rest = l.filter(x => !(PathManagement.getParentPath(x.get_path()).get.equals(pathForMax)))
-    val deepest = l.filter(x => PathManagement.getParentPath(x.get_path()).get.equals(pathForMax))
+    val rest = l.filter(x => !(PathManagement.getParentPath(x.path).get.equals(pathForMax)))
+    val deepest = l.filter(x => PathManagement.getParentPath(x.path).get.equals(pathForMax))
 
     val parentPath = PathManagement.getParentPath(pathForMax)
     (deepest, rest, parentPath)
