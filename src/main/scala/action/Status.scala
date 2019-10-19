@@ -5,7 +5,11 @@ import java.io.File
 import util.{FileManagement, PathManagement, SgitTools, StageManagement}
 
 object Status {
-   def status(): Unit = {
+
+  /**
+   * Print the files added, the files updated and the files untracked to the console
+   */
+  def status(): Unit = {
      if(PathManagement.getSgitPath().isEmpty){
        println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
      } else {
@@ -26,7 +30,10 @@ object Status {
      }
    }
 
-  //Display files added since the last commit
+  /**
+   * Display files added since the last commit
+   * @param currentBranch : the current branch
+   */
   def displayAddedFiles(currentBranch: String): Unit = {
     //Retrieve useful data
     val addedFiles = StageManagement.getAddedFiles(currentBranch)
@@ -38,7 +45,10 @@ object Status {
     }
   }
 
-  //Display the files updated since the last commit but not added
+  /**
+   * Display the files updated since the last commit but not added
+   * @param currentBranch : the current branch
+   */
   def displayUpdatedFiles(currentBranch: String): Unit = {
     //Retrieve files from stage
     val updatedFiles = getUpdatedFiles(currentBranch)
@@ -51,7 +61,10 @@ object Status {
     }
   }
 
-  //Display files never added
+  /**
+   * Display files never added
+   * @param currentBranch : the current branch
+   */
   def displayUntrackedFiles(currentBranch: String): Unit = {
     val untrackedFiles = getUntrackedFiles(currentBranch)
     if(!untrackedFiles.isEmpty) {
@@ -63,7 +76,11 @@ object Status {
     }
   }
 
-  //Return an array with all updated files in the stage since the last add
+  /**
+   * Get the files updated since the last adding
+   * @param currentBranch : the current branch
+   * @return an array with all updated files in the stage since the last adding
+   */
   def getUpdatedFiles(currentBranch: String): Array[String] = {
     var updatedFiles = Array[String]()
     val filesInStage = StageManagement.getStageContent(currentBranch)
@@ -75,7 +92,12 @@ object Status {
     updatedFiles
   }
 
-  //Return true if the file has been updated since the last add (with the hash)
+  /**
+   * To know if a file is updated
+   * @param filePath : the path of the file
+   * @param fileHash : the hash of the file
+   * @return true if the file has been updated since the last add, else return false
+   */
   def fileIsUpdated(filePath: String, fileHash: String): Boolean = {
     val fileName = filePath.split(File.separator).last
     val fileContent = FileManagement.readFile(new File(filePath))
@@ -83,7 +105,11 @@ object Status {
     newFileHash != fileHash
   }
 
-  //Return an array with all untracked files (not in the stage)
+  /**
+   * Get files untracked
+   * @param currentBranch : the current branch
+   * @return an array with all untracked files (not in the stage, never commited)
+   */
   def getUntrackedFiles(currentBranch: String): List[String] = {
     //Retrieve files from project
     var allFiles = FileManagement.getFilesFromDirectory(new File(PathManagement.getProjectPath().get))

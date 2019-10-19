@@ -6,8 +6,13 @@ import java.nio.file.{Files, Paths}
 import model.{Blob, Delta}
 import util.{FileManagement, PathManagement, SgitTools, StageManagement}
 
+import scala.annotation.tailrec
+
 object Diff {
 
+  /**
+   * Get the difference between files of the working directory and files added
+   */
   def diff(): Unit = {
     if(PathManagement.getSgitPath().isEmpty){
       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
@@ -32,7 +37,13 @@ object Diff {
     }
   }
 
-  //Print the differences to the console
+  /**
+   * Print the differences between 2 files to the console
+   * @param filePath : the path of the file
+   * @param oldFileHash : the hash of the first version of the file
+   * @param newFileHash : the hash of the second version of the file
+   * @param deltas : the list of differences between the 2 versions of the file
+   */
   def printDiff(filePath: String, oldFileHash: String, newFileHash: String, deltas: List[Delta]): Unit = {
     if(!deltas.isEmpty) {
       println("diff --git a/" + filePath + " b/" + filePath)
@@ -47,17 +58,27 @@ object Diff {
     }
   }
 
-  //Return a list of deltas between 2 files
-  //The list contains modifications between the 2 version of the file (with the line, the action + or - and the content of the line)
+  /**
+   * Get differences between 2 files
+   * @param oldFileHash : the hash of the first version of the file
+   * @param newFilePath : the hash of the new version of the file
+   * @return a list of deltas between 2 files
+   */
   def getDeltasBetweenFiles(oldFileHash: String, newFilePath: Option[String]): List[Delta] = {
 
+    /**
+     * Get differences between 2 lists
+     * @param oldList : the first list to compare with the second
+     * @param newList : the second list to compare with the first
+     * @return a list of deltas between 2 lists
+     */
     def getDeltasBetweenLists(oldList: List[String], newList: List[String]): List[Delta] = {
       //If the newFile is empty
       if(newList.isEmpty){
         oldList.map(line => Delta(0, "-", line))
       } else {
         //Create and fill a matrix with deltas between the 2 lists in parameters
-        val matrix = fillMatrix(oldList, newList, 1, 1, initializeMatrix(oldList, newList))
+        val matrix = fillMatrix(oldList, newList, 1, 1, Array.fill(oldList.length+1, newList.length+1)(0))
         //Retrieve the deltas from the matrix
         getDeltasFromMatrix(oldList, newList, oldList.length, newList.length, matrix, List[Delta]())
       }
@@ -73,12 +94,16 @@ object Diff {
     getDeltasBetweenLists(oldFileContent, newFileContent)
   }
 
-  //Create an empty matrix with a size of oldList+1 X newList+1
-  def initializeMatrix(oldList: List[String], newList: List[String]): Array[Array[Int]] = {
-    Array.fill(oldList.length+1, newList.length+1)(0)
-  }
-
-  //Fill the matrix in parameters with deltas between the 2 lists in parameters
+  /**
+   * Fill a matrix with differences between 2 lists
+   * @param oldList : the first list to compare with the second
+   * @param newList : the second list to compare to the first
+   * @param i : the current line
+   * @param j : the current column
+   * @param matrix : an accumulator matrix to fill
+   * @return a matrix filled with differences between the 2 lists
+   */
+  @tailrec
   def fillMatrix(oldList: List[String], newList: List[String], i: Int, j: Int, matrix: Array[Array[Int]]): Array[Array[Int]] = {
     //If the matrix is fill
     if(i == oldList.length+1 && j == 1) matrix
@@ -94,6 +119,17 @@ object Diff {
   }
 
   //Go up the matrix to know elements added or deleted
+  /**
+   * Get the differences from a matrix
+   * @param oldList : the first list to compare with the second
+   * @param newList : the second list to compare to the first
+   * @param i : the current line
+   * @param j : the current column
+   * @param matrix : the matrix to browse
+   * @param deltas : an accumulator, a list of differences
+   * @return the list of differences at the end
+   */
+  @tailrec
   def getDeltasFromMatrix(oldList: List[String], newList: List[String], i: Int, j: Int, matrix: Array[Array[Int]], deltas: List[Delta]): List[Delta] = {
     //If we go up the 2 lists
     if(i == 0 && j == 0) deltas
@@ -106,8 +142,12 @@ object Diff {
     }
   }
 
-  //Get the difference between files and the same files in the commit in parameters
-  //Return the number of files changed, the number of insertions, the number of deletions and a list with files created
+  /**
+   * Get the difference between files and the same files in the commit in parameters
+   * @param files : a list of files to compare to the same files in the commit
+   * @param commitHash : the hash of the commit to compare
+   * @return the number of files changed, the number of insertions, the number of deletions and a list with files created
+   */
   def getDeltasBetweenFilesAndCommit(files: List[(String, String, String)], commitHash: String): (Int, Int, Int, List[String]) = {
     //If it's not the first commit
     if(commitHash != "Nil") {

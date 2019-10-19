@@ -2,12 +2,16 @@ package action
 
 import java.io.File
 
-import model.{Commit, Tree, Element}
-import util.{FileManagement, SgitTools, LogWriter, PathManagement, StageManagement}
+import model.{Commit, Element, Tree}
+import util.{FileManagement, LogWriter, PathManagement, SgitTools, StageManagement}
+
+import scala.annotation.tailrec
 
 object CommitAction {
 
-  //Commit all the files add previously (on the stage)
+  /**
+   * Commit all the files add previously (on the stage)
+   */
   def commit(): Unit = {
     if(PathManagement.getSgitPath().isEmpty){
       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
@@ -46,8 +50,11 @@ object CommitAction {
     }
   }
 
-  //Create a list with all elements of the stage
-  //Return 2 lists of elements : 1 with files not at root and 1 with files at root
+  /**
+   * Retrieve all elements of the stage
+   * @param currentBranch : the current branch to get the right stage
+   * @return 2 lists of elements : 1 with files not at root and 1 with files at root
+   */
   def getStageFiles(currentBranch: String): (List[Element], List[Element]) = {
     val stageContent = StageManagement.getStageContent(SgitTools.getCurrentBranch())
     //Get the paths
@@ -63,8 +70,13 @@ object CommitAction {
     (elements, rootBlobs)
   }
 
-  //Add trees with a list of paths added
-  //Return a list of trees at root
+  /**
+   * Add trees to the .sgit with a list of elements added
+   * @param l : list of elements
+   * @param rootTrees : an accumulator for trees at root
+   * @return the list of trees at root when it's completed
+   */
+    @tailrec
   def addTrees(l: List[Element], rootTrees: Option[List[Element]]): List[Element] = {
     if(l.size == 0){
       if(rootTrees.isEmpty) {
@@ -87,8 +99,11 @@ object CommitAction {
     }
   }
 
-  //Find the deeper directory of a list
-  //Return a list with entries of the deeper directory, a list with the rest and the parent path of the deeper directory
+  /**
+   * Find the deeper directory of a list
+   * @param l : the list of elements
+   * @return a list with elements of the deeper directory, a list with the rest and the parent path of the deeper directory
+   */
   def getDeeperDirectory(l: List[Element]): (List[Element], List[Element], Option[String]) = {
     var max = 0
     var pathForMax = ""

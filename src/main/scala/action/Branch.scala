@@ -9,7 +9,10 @@ import scala.io.Source
 
 object Branch {
 
-  //Create a branch with the name of the arg
+  /**
+   * Create a new branch
+   * @param command : arguments given (the name of the branch)
+   */
   def branch(command: Array[String]): Unit = {
     if(PathManagement.getSgitPath().isEmpty){
       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
@@ -42,7 +45,9 @@ object Branch {
     }
   }
 
-  //List all the branches and give the current branch
+  /**
+   * List all the branches to the console and give the current branch
+   */
   def branchAV(): Unit = {
     if(PathManagement.getSgitPath().isEmpty){
       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
@@ -56,7 +61,12 @@ object Branch {
     }
   }
 
-  //Print a branch
+  /**
+   * Print branch information to the console
+   * @param branchName : the name of the branch
+   * @param lastCommit : the hash of the last commit
+   * @param currentBranch : the name of the current branch
+   */
   def printBranch(branchName: String, lastCommit: String, currentBranch: String): Unit = {
     if(branchName == currentBranch) {
       println(Console.GREEN + "* " + branchName + "\t" + lastCommit + Console.WHITE)

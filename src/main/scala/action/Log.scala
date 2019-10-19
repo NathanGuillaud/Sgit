@@ -9,6 +9,9 @@ import scala.io.Source
 
 object Log {
 
+  /**
+   * Print all the commits
+   */
   def log(): Unit = {
     if(PathManagement.getSgitPath().isEmpty){
       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
@@ -23,6 +26,10 @@ object Log {
     }
   }
 
+  /**
+   * Print information about one commit
+   * @param commitLine : The line of the commit concerned in logs file
+   */
   def printCommit(commitLine: String): Unit = {
     val commitValues = commitLine.split("::")
     println(Console.YELLOW + "commit:" + "\t" + commitValues(0) + Console.WHITE)

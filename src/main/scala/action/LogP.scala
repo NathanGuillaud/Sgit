@@ -10,6 +10,9 @@ import scala.io.Source
 
 object LogP {
 
+  /**
+   * Print all the commits with differences with the previous
+   */
   def logP(): Unit = {
     //If .sgit is not found
     if(PathManagement.getSgitPath().isEmpty){
@@ -30,7 +33,11 @@ object LogP {
     }
   }
 
-  //Print the deltas details between 2 commits
+  /**
+   * Print the deltas details between 2 commits
+   * @param commitParent : the hash of the previous commit
+   * @param commitChild : the hash of the current commit
+   */
   def printDeltasBetweenCommits(commitParent: String, commitChild: String): Unit = {
     val filesForParentCommit = if(commitParent != "Nil") Blob.getAllBlobsForCommit(commitParent) else List[(String, String)]()
     val filesForChildCommit = Blob.getAllBlobsForCommit(commitChild)
