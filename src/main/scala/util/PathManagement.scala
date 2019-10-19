@@ -50,10 +50,7 @@ object PathManagement {
   }
 
   def getFilePathFromProjectRoot(filePath: String): Option[String] = {
-    var projectPath = ""
-    if(!getParentPath(getSgitPath().get).isEmpty) {
-      projectPath = getParentPath(getSgitPath().get).get
-    }
+    val projectPath = if(!getParentPath(getSgitPath().get).isEmpty) getParentPath(getSgitPath().get).get else ""
     if(projectPath.isEmpty) None
     else Some(filePath.substring(projectPath.length+1))
   }

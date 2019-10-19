@@ -19,7 +19,7 @@ Git implementation in Scala.
 
 - sgit log ✅
 - sgit log -p ✅
-- sgit log —stat ❌
+- sgit log —stat ✅
 
 ## Branches & tags
 

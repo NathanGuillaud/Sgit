@@ -30,19 +30,8 @@ case class Tree(
     FileManagement.hashTreeOrCommit(this.toString())
   }
 
-  /*def fillWithBlobsAndTrees(blobs: List[Element], trees: List[Element]): Unit = {
-    trees.map(t =>
-      this.set_content(this.addElement(t.get_elem_type(), t.get_hash(), t.get_path()))
-    )
-    blobs.map(b =>
-      this.set_content(this.addElement(b.get_elem_type(), b.get_hash(), b.get_path()))
-    )
-  }*/
-
   override def toString(): String = {
-    var display: String = ""
-    this.content.map(x => display = display + x.elemType + " " + x.hash + " " + x.path + "\n")
-    display
+    this.content.map(x => x.elemType + " " + x.hash + " " + x.path).mkString("\n")
   }
 
   def saveTreeFile(): Unit = {
@@ -59,9 +48,12 @@ case class Tree(
 }
 
 object Tree {
-  def apply(): Tree = {
-    new Tree
-  }
 
+  //Create a tree and return his hash value
+  def createTree(deeper: List[Element]): String = {
+    val tree = new Tree(deeper)
+    tree.saveTreeFile()
+    tree.id
+  }
 
 }

@@ -44,8 +44,6 @@ case class Commit(
 }
 
 object Commit {
-  //def apply(tId: String): Commit = new Commit("", new Date(), "Nathan Guillaud", tId)
-
   //Retrieve the root tree for the commit give in parameters
   def getTreeForCommit(commitHash: String): String = {
     val commitFolder = commitHash.substring(0,2)

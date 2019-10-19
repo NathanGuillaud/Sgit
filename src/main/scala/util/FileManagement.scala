@@ -58,9 +58,7 @@ object FileManagement {
   //Return the hash of the file in parameters in the list in parameters
   def getFileHashFromList(filePath: String, fileList: List[(String, String)]): String = {
     if(fileIsInList(filePath, fileList)) {
-      var path = ""
-      fileList.map(file => if(file._1 == filePath) path = file._2)
-      path
+      fileList.filter(file => file._1 == filePath).map(file => file._2).last
     } else {
       "0000000"
     }

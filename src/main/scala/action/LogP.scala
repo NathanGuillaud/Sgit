@@ -34,22 +34,24 @@ object LogP {
   def printDeltasBetweenCommits(commitParent: String, commitChild: String): Unit = {
     val filesForParentCommit = if(commitParent != "Nil") Blob.getAllBlobsForCommit(commitParent) else List[(String, String)]()
     val filesForChildCommit = Blob.getAllBlobsForCommit(commitChild)
-    filesForChildCommit.map(file =>
-      if(FileManagement.fileIsInList(file._1, filesForParentCommit))
+    filesForChildCommit.map(file => {
+      println(file._1 +" "+FileManagement.fileIsInList(file._1, filesForParentCommit))
+      if (FileManagement.fileIsInList(file._1, filesForParentCommit)) {
+        println(file._1 + " " + FileManagement.getFileHashFromList(file._1, filesForParentCommit))
         Diff.printDiff(
           file._1,
           FileManagement.getFileHashFromList(file._1, filesForParentCommit),
           file._2,
           Diff.getDeltasBetweenFiles(FileManagement.getFileHashFromList(file._1, filesForParentCommit), Some(file._1))
         )
-      else
+      } else
         Diff.printDiff(
           file._1,
           "0000000",
           file._2,
           Diff.getDeltasBetweenFiles("0000000", Some(file._1))
         )
-    )
+    })
   }
 
 }

@@ -117,9 +117,7 @@ object Diff {
       files.map(file => {
         //If the current file is not a new file
         var oldFileHash = "0000000"
-        println(file._2 + " - " + Blob.fileIsInCommit(file._2, commitHash))
         if(Blob.fileIsInCommit(file._2, commitHash)) {
-          println(file._2 + " - " + Blob.getFileHashInCommit(file._2, commitHash))
           oldFileHash = Blob.getFileHashInCommit(file._2, commitHash)
         } else {
           newFiles = file._2 :: newFiles

@@ -74,7 +74,7 @@ object CommitAction {
       }
     } else {
       val (deeperList, restList, parentPath) = getDeeperDirectory(l)
-      val hash = createTree(deeperList)
+      val hash = Tree.createTree(deeperList)
       if(parentPath.isEmpty) {
         if (rootTrees.isEmpty){
           addTrees(restList, Some(List(new Element(PathManagement.getParentPath(deeperList(0).path).get, hash, "tree"))))
@@ -85,13 +85,6 @@ object CommitAction {
         addTrees(new Element(PathManagement.getParentPath(deeperList(0).path).get, hash, "tree") :: restList, rootTrees)
       }
     }
-  }
-
-  //Create a tree and return his hash value
-  def createTree(deeper: List[Element]): String = {
-    val tree = new Tree(deeper)
-    tree.saveTreeFile()
-    tree.id
   }
 
   //Find the deeper directory of a list
