@@ -2,6 +2,24 @@
 
 Git implementation in Scala.
  
+#  Installation
+
+```shell script
+$ git clone https://github.com/MartinCayuelas/sgit.git
+$ cd sgit
+$ source install.sh
+```
+
+Now, you can run sgit command from everywhere !
+
+#  Tests
+
+To run tests, go to the sgit directory and run the following command:
+```shell script
+$ sbt test
+```
+
+# Features
 
 ## Create
 

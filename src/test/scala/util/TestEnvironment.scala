@@ -31,5 +31,5 @@ object TestEnvironment {
     System.setProperty("user.dir", parentPath.toString)
     new Directory(new File("tmpDirForTests")).deleteRecursively()
   }
-  
+
 }
