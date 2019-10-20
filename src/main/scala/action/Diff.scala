@@ -75,9 +75,6 @@ object Diff {
     def getDeltasBetweenLists(oldList: List[String], newList: List[String]): List[Delta] = {
       //If the newFile is empty
       if(newList.isEmpty){
-        println("---------------")
-        println("EMPTYYYYYYYYY")
-        println("---------------")
         oldList.map(line => Delta(0, "-", line))
       } else {
         //Create and fill a matrix with deltas between the 2 lists in parameters

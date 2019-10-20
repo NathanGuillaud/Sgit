@@ -21,20 +21,6 @@ class TestDiff extends FunSuite with BeforeAndAfterEach {
     assert(Diff.getDeltasBetweenFiles("0000000", None).length == 0)
   }
 
-  test("diff between 1 empty file and 1 non empty file should return a list with the number of lines of the new file") {
-    val nbLinesOfNewFile = FileManagement.readFile(new File(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt")).split("\n").length
-
-    assert(Diff.getDeltasBetweenFiles("0000000", PathManagement.getFilePathFromProjectRoot(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt")).length == nbLinesOfNewFile)
-  }
-
-  test("diff between 1 empty file and 1 non empty file should return a list with only insertions") {
-    val nbLinesOfNewFile = FileManagement.readFile(new File(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt")).split("\n").length
-    val deltas = Diff.getDeltasBetweenFiles("0000000", PathManagement.getFilePathFromProjectRoot(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt"))
-
-    assert(LogStat.getNumberOfActionInDeltas("+", deltas) == nbLinesOfNewFile)
-    assert(LogStat.getNumberOfActionInDeltas("-", deltas) == 0)
-  }
-
   test("diff between 1 non empty file and 1 empty file should return a list with the number of lines of the old file") {
     Init.init()
     Add.add(Array("rootTestDiff.txt"))
