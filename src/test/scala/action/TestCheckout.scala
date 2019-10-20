@@ -33,18 +33,26 @@ class TestCheckout extends FunSuite with BeforeAndAfterEach {
   }
 
   test("sgit checkout with branch name give an old version of a file") {
+    //Initialisation of a sgit repository
     Init.init()
+    //Create a branch name
     val branchName = "azsq"
-    //First commit
+    //Add a file with content "version1"
     Add.add(Array("testCheckout.txt"))
+    //Commit the stage with the file "testCheckout.txt"
     CommitAction.commit()
-    //Second commit
+    //Create a branch
     Branch.branch(Array(branchName))
+    //Update the content of the file to "version2"
     updateTmpFile()
+    //Add the file in the branch master
     Add.add(Array("testCheckout.txt"))
+    //Commit the file in the branch master
     CommitAction.commit()
+    //Go to the branch "azsq" with the first version of the file
     Checkout.checkout(Array(branchName))
 
+    //Check that the content is "version1"
     assert(FileManagement.readFile(new File(s"${System.getProperty("user.dir")}${File.separator}testCheckout.txt")) == "version1")
   }
 

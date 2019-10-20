@@ -42,9 +42,7 @@ object LogP {
     val filesForParentCommit = if(commitParent != "Nil") Blob.getAllBlobsForCommit(commitParent) else List[(String, String)]()
     val filesForChildCommit = Blob.getAllBlobsForCommit(commitChild)
     filesForChildCommit.map(file => {
-      println(file._1 +" "+FileManagement.fileIsInList(file._1, filesForParentCommit))
       if (FileManagement.fileIsInList(file._1, filesForParentCommit)) {
-        println(file._1 + " " + FileManagement.getFileHashFromList(file._1, filesForParentCommit))
         Diff.printDiff(
           file._1,
           FileManagement.getFileHashFromList(file._1, filesForParentCommit),
