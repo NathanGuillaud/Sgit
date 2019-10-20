@@ -55,12 +55,54 @@ class TestDiff extends FunSuite with BeforeAndAfterEach {
     assert(LogStat.getNumberOfActionInDeltas("+", deltas) == 0)
   }
 
+  test("diff between 2 files should return 1 insertion") {
+    Init.init()
+    Add.add(Array("rootTestDiff.txt"))
+    val oldHash = FileManagement.hashFile("rootTestDiff.txt", FileManagement.readFile(new File(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt")))
+    updateFileOneInsertion()
+    val deltas = Diff.getDeltasBetweenFiles(oldHash, Some("rootTestDiff.txt"))
+
+    assert(LogStat.getNumberOfActionInDeltas("-", deltas) == 0)
+    assert(LogStat.getNumberOfActionInDeltas("+", deltas) == 1)
+  }
+
+  test("diff between 2 files should return 1 deletion") {
+    Init.init()
+    Add.add(Array("rootTestDiff.txt"))
+    val oldHash = FileManagement.hashFile("rootTestDiff.txt", FileManagement.readFile(new File(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt")))
+    updateFileOneDeletion()
+    val deltas = Diff.getDeltasBetweenFiles(oldHash, Some("rootTestDiff.txt"))
+
+    assert(LogStat.getNumberOfActionInDeltas("-", deltas) == 1)
+    assert(LogStat.getNumberOfActionInDeltas("+", deltas) == 0)
+  }
+
+  test("diff between 2 files should return 1 insertion and 2 deletions") {
+    Init.init()
+    Add.add(Array("rootTestDiff.txt"))
+    val oldHash = FileManagement.hashFile("rootTestDiff.txt", FileManagement.readFile(new File(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt")))
+    updateFileOneInsertionTwoDeletions()
+    val deltas = Diff.getDeltasBetweenFiles(oldHash, Some("rootTestDiff.txt"))
+
+    assert(LogStat.getNumberOfActionInDeltas("-", deltas) == 2)
+    assert(LogStat.getNumberOfActionInDeltas("+", deltas) == 1)
+  }
+
   def createTmpDirectory(): Unit = {
-    new File(s"${System.getProperty("user.dir")}${File.separator}testDiff${File.separator}subDir").mkdirs()
-    new File(s"${System.getProperty("user.dir")}${File.separator}testDiff${File.separator}testDiff.txt").createNewFile()
-    new File(s"${System.getProperty("user.dir")}${File.separator}testDiff${File.separator}subDir${File.separator}subDirTestDiff.txt").createNewFile()
     new File(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt").createNewFile()
     FileManagement.writeFile(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt", "Hello\nWorld")
+  }
+
+  def updateFileOneInsertion(): Unit = {
+    FileManagement.writeFile(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt", "Hello\nWorld\ntest")
+  }
+
+  def updateFileOneDeletion(): Unit = {
+    FileManagement.writeFile(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt", "World")
+  }
+
+  def updateFileOneInsertionTwoDeletions(): Unit = {
+    FileManagement.writeFile(s"${System.getProperty("user.dir")}${File.separator}rootTestDiff.txt", "Test")
   }
 
 }

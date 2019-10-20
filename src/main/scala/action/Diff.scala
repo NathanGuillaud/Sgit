@@ -84,12 +84,12 @@ object Diff {
       }
     }
 
-    val newFileContent = if(!newFilePath.isEmpty)
+    val newFileContent = if(!newFilePath.isEmpty) {
       FileManagement.readFile(new File(PathManagement.getProjectPath().get + "/" + newFilePath.get)).split("\n").toList
-    else List[String]()
-    val oldFileContent = if(oldFileHash != "0000000")
+    } else List[String]()
+    val oldFileContent = if(oldFileHash != "0000000") {
       FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + oldFileHash.substring(0,2) + "/" + oldFileHash.substring(2))).split("\n").toList
-    else List[String]()
+    } else List[String]()
 
     getDeltasBetweenLists(oldFileContent, newFileContent)
   }
