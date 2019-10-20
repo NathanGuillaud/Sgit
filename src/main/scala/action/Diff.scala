@@ -75,6 +75,9 @@ object Diff {
     def getDeltasBetweenLists(oldList: List[String], newList: List[String]): List[Delta] = {
       //If the newFile is empty
       if(newList.isEmpty){
+        println("---------------")
+        println("EMPTYYYYYYYYY")
+        println("---------------")
         oldList.map(line => Delta(0, "-", line))
       } else {
         //Create and fill a matrix with deltas between the 2 lists in parameters
@@ -86,10 +89,14 @@ object Diff {
 
     val newFileContent = if(!newFilePath.isEmpty) {
       FileManagement.readFile(new File(PathManagement.getProjectPath().get + "/" + newFilePath.get)).split("\n").toList
-    } else List[String]()
+    } else {
+      List[String]()
+    }
     val oldFileContent = if(oldFileHash != "0000000") {
       FileManagement.readFile(new File(PathManagement.getSgitPath().get + "/objects/blob/" + oldFileHash.substring(0,2) + "/" + oldFileHash.substring(2))).split("\n").toList
-    } else List[String]()
+    } else {
+      List[String]()
+    }
 
     getDeltasBetweenLists(oldFileContent, newFileContent)
   }
