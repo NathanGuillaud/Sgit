@@ -5,7 +5,7 @@ Git implementation in Scala.
 #  Installation
 
 ```shell script
-$ git clone https://github.com/MartinCayuelas/sgit.git
+$ git clone https://github.com/NathanGuillaud/Sgit.git
 $ cd sgit
 $ source install.sh
 ```
