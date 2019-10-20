@@ -17,10 +17,13 @@ object Checkout {
       println("fatal: Not a sgit repository (or any of the parent directories): .sgit")
     } else if(branchExist(command(0))) {
       constructProjectFromBranch(command(0))
+      println("Switched to the branch " + command(0))
     } else if(tagExist(command(0))) {
       constructProjectFromTag(command(0))
+      println("Switched to the tag " + command(0))
     } else if(commitExist(command(0))) {
       constructProjectFromCommit(command(0))
+      println("Switched to the commit " + command(0))
     } else {
       println(s"error: pathspec ${command(0)} did not match any file(s) known to sgit.")
     }
