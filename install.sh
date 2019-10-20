@@ -1,5 +1,5 @@
 #!/bin/bash
-#sbt package
+sbt package
 chmod u+x sgit.sh
 ln -s sgit.sh sgit
 export PATH=$PATH:`pwd`
