@@ -4,6 +4,9 @@ Git implementation in Scala.
  
 #  Installation
 
+Warning: work with scala version 2.12.10.
+With other versions, an error appears: java.lang.NoSuchMethodError.
+
 ```shell script
 $ git clone https://github.com/NathanGuillaud/Sgit.git
 $ cd Sgit
