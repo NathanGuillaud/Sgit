@@ -5,7 +5,12 @@ import java.nio.file.{Files, Paths}
 
 object StageManagement {
 
-  //Add a file to the stage if the file has been modified since the last adding
+  /**
+   * Add a file to the stage if the file has been modified since the last adding
+   * @param path : path of the file to add in the stage
+   * @param hashId : hash of the file to add in the stage
+   * @param currentBranch : current branch
+   */
   def addFileInStage(path: String, hashId: String, currentBranch: String): Unit = {
     val pathToAdd = path.replaceAllLiterally("./", "")
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
@@ -24,7 +29,11 @@ object StageManagement {
     }
   }
 
-  //Remove a file from the stage if the file exists on the stage
+  /**
+   * Remove a file from the stage if the file exists on the stage
+   * @param filePath : path of the file to remove from the stage
+   * @param currentBranch : current branch
+   */
   def removeFileFromStage(filePath: String, currentBranch: String): Unit = {
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
     val files = FileManagement.readFile(new File(pathBranchStage))
@@ -36,7 +45,12 @@ object StageManagement {
     }
   }
 
-  //Return true if the file in parameters is in the stage (already add or commit), else return false
+  /**
+   * To knox if a file is in the stage
+   * @param filePath : path of the file to search in the stage
+   * @param currentBranch : current branch
+   * @return true if the file in parameters is in the stage (already add or commit), else return false
+   */
   def fileIsInStage(filePath: String, currentBranch: String): Boolean = {
     var fileInStage = false
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
@@ -52,7 +66,10 @@ object StageManagement {
     fileInStage
   }
 
-  //Archive a file from the stage after a commit (remove the *)
+  /**
+   * Archive a file from the stage after a commit (change the state from "added" to "commited")
+   * @param currentBranch : current branch
+   */
   def archiveFilesFromStage(currentBranch: String): Unit = {
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
     val stageContent = getStageContent(currentBranch)
@@ -61,7 +78,11 @@ object StageManagement {
     FileManagement.writeFile(pathBranchStage, newContent)
   }
 
-  //Return true if the stage contains at least 1 new file since the last commit, else return false
+  /**
+   * To know if the stage contains new files (not commited)
+   * @param currentBranch : current branch
+   * @return true if the stage contains at least 1 new file since the last commit, else return false
+   */
   def containsNewFiles(currentBranch: String): Boolean = {
     var containsNewFile = false
     val stageContent = getStageContent(currentBranch)
@@ -73,7 +94,16 @@ object StageManagement {
     containsNewFile
   }
 
-  //Get the content of the stage file for a given branch
+  /**
+   * Get the content of the stage file for a given branch
+   * @param currentBranch : current branch
+   * @return All the content of the stage split by line.
+   *         Each line is an array of 4 String :
+   *         1 : the path of the file from the root of the project
+   *         2 : the hash of the file
+   *         3 : the state ("added" or "commited")
+   *         4 : if the file is "new", "modified", or "-" (for sgit status)
+   */
   def getStageContent(currentBranch: String): Array[Array[String]] = {
     val pathBranchStage = s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}"
     val stage = new File(pathBranchStage)
@@ -82,19 +112,23 @@ object StageManagement {
     else Array[Array[String]]()
   }
 
-  //Delete all the content of the stage
-  def clearStage(currentBranch: String): Unit = {
-    FileManagement.writeFile(s"${PathManagement.getSgitPath().get}${File.separator}stages${File.separator}${currentBranch}", "")
-  }
-
-  //Get all files added since the last commit in the stage
-  //Return a list of tuples with the stage (new or modified), the path and the hash
+  /**
+   * Get all files added since the last commit in the stage
+   * @param currentBranch : current branch
+   * @return a list of tuples (files) with the state (new or modified), the path and the hash
+   */
   def getAddedFiles(currentBranch: String): List[(String, String, String)] = {
     val stageContent = getStageContent(currentBranch)
     stageContent.filter(line => line(2) == "added").map(line => (line(3), line(0), line(1))).toList
   }
 
-  //Return true if the file give in parameter has changed since the last adding, else return false
+  /**
+   * To know if a file has been modified
+   * @param path : path of the file concerned
+   * @param hashId : new hash of the file
+   * @param currentBranch : current branch
+   * @return true if the file give in parameter has changed since the last adding, else return false
+   */
   def fileHasChange(path: String, hashId: String, currentBranch: String): Boolean = {
     var hasChange = true
     getStageContent(currentBranch).map(file =>
